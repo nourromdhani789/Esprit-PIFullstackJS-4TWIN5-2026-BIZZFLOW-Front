@@ -3,6 +3,9 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
+import ForgotPassword from "./pages/AuthPages/ForgotPassword";
+import ResetPassword from "./pages/AuthPages/ResetPassword";
+import VerifyEmail from "./pages/AuthPages/VerifyEmail";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
 import Videos from "./pages/UiElements/Videos";
@@ -22,6 +25,7 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import TeamInvitations from "./pages/TeamInvitations";
 import AcceptInvitation from "./pages/AcceptInvitation";
+import BusinessManagement from "./pages/BusinessManagement";
 
 // Wrapper component for protected dashboard routes
 const DashboardLayout = () => (
@@ -65,11 +69,15 @@ export default function App() {
 
             {/* Team Management - Visible to all for now */}
             <Route path="/team-invitations" element={<TeamInvitations />} />
+            <Route path="/business-management" element={<BusinessManagement />} />
           </Route>
 
           {/* Auth Layout - Public Routes */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
 
           {/* Fallback Route */}

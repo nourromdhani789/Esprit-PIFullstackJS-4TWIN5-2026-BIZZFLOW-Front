@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { invitationService, Invitation } from '../services/invitation.service';
+import { authService } from '../services/auth.service';
 import PageMeta from '../components/common/PageMeta';
 import PageBreadcrumb from '../components/common/PageBreadCrumb';
 import { Modal } from '../components/ui/modal';
@@ -18,7 +19,9 @@ const AVAILABLE_ROLES = [
 export default function TeamInvitations() {
   const { user, hasRole } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -41,8 +44,21 @@ export default function TeamInvitations() {
     }
   };
 
+  const fetchTenantMembers = async () => {
+    setIsLoadingMembers(true);
+    try {
+      const data = await authService.getTenantMembers();
+      setMembers(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load tenant members');
+    } finally {
+      setIsLoadingMembers(false);
+    }
+  };
+
   useEffect(() => {
     fetchInvitations();
+    fetchTenantMembers();
   }, []);
 
   const handleInvite = async (e: React.FormEvent) => {
@@ -78,6 +94,18 @@ export default function TeamInvitations() {
       fetchInvitations(); // Refresh list
     } catch (err: any) {
       setError(err.message || 'Failed to revoke invitation');
+    }
+  };
+
+  const handleDeleteMember = async (memberId: string) => {
+    if (!confirm('Are you sure you want to delete this team member? This action cannot be undone.')) return;
+    
+    try {
+      await authService.deleteTenantMember(memberId);
+      setSuccessMessage('Team member deleted successfully');
+      fetchTenantMembers(); // Refresh list
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete team member');
     }
   };
 
@@ -222,6 +250,96 @@ export default function TeamInvitations() {
                             className="text-red-600 hover:text-red-800 dark:hover:text-red-400 text-sm font-medium"
                           >
                             Revoke
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Tenant Members Table */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Team Members
+            </h2>
+          </div>
+          
+          {isLoadingMembers ? (
+            <div className="p-8 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">Loading team members...</p>
+            </div>
+          ) : members.length === 0 ? (
+            <div className="p-8 text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+              </svg>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">No team members yet</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">
+                Invite team members to see them here
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 dark:bg-gray-700/50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Joined
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {members.map((member) => (
+                    <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        {member.firstName} {member.lastName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        {member.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        {member.roleId}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          member.isActive 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        }`}>
+                          {member.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {member.createdAt ? new Date(member.createdAt).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        {member.roleId !== 'BUSINESS_OWNER' && (
+                          <button
+                            onClick={() => handleDeleteMember(member.id)}
+                            className="text-red-600 hover:text-red-800 dark:hover:text-red-400 text-sm font-medium"
+                          >
+                            Delete
                           </button>
                         )}
                       </td>
