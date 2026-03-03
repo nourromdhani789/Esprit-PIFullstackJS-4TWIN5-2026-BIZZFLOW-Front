@@ -73,6 +73,72 @@ export const authService = {
     }
   },
 
+  async updateProfile(data: Partial<RegisterData>): Promise<any> {
+    try {
+      const response = await api.patch('/users/profile', data);
+      // Update local storage with new user data
+      const currentUser = this.getUser();
+      if (currentUser) {
+        const updatedUser = { ...currentUser, ...response.data };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to update profile');
+    }
+  },
+
+  async getTenantMembers(): Promise<any[]> {
+    try {
+      const response = await api.get('/users/tenant/members');
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to get tenant members');
+    }
+  },
+
+  async deleteTenantMember(userId: string): Promise<any> {
+    try {
+      const response = await api.delete(`/users/tenant/members/${userId}`);
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to delete tenant member');
+    }
+  },
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    try {
+      const response = await api.post('/auth/reset-password', { email });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to send password reset email');
+    }
+  },
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    try {
+      const response = await api.post('/auth/confirm-reset-password', { token, newPassword });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to reset password');
+    }
+  },
+
+  async verifyEmail(token: string): Promise<{ message: string }> {
+    try {
+      const response = await api.post('/auth/verify-email', { token });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to verify email');
+    }
+  },
+
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
