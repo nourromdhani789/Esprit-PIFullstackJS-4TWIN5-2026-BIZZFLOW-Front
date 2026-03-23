@@ -1,4 +1,5 @@
 import { useState, useEffect, FormEvent } from "react";
+import { useBusiness } from "../contexts/BusinessContext";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { businessService, Business, CreateBusinessDto } from "../services/business.service";
 import Button from "../components/ui/button/Button";
@@ -6,12 +7,16 @@ import Label from "../components/form/Label";
 import Input from "../components/form/input/InputField";
 
 export default function BusinessManagement() {
+  const { refreshBusiness } = useBusiness();
   const [business, setBusiness] = useState<Business | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState<CreateBusinessDto>({
@@ -38,21 +43,27 @@ export default function BusinessManagement() {
     try {
       const data = await businessService.getMyBusiness();
       setBusiness(data);
-      // Populate form with existing data
-      setFormData({
-        name: data.name || "",
-        legalName: data.legalName || "",
-        taxNumber: data.taxNumber || "",
-        currency: data.currency || "USD",
-        taxRate: data.taxRate || 0,
-        address: data.address || "",
-        phone: data.phone || "",
-        website: data.website || "",
-        logoUrl: data.logoUrl || "",
-        primaryColor: data.primaryColor || "#3B82F6",
-        secondaryColor: data.secondaryColor || "#1E40AF",
-        accentColor: data.accentColor || "#F59E0B",
-      });
+      if (data) {
+        // Populate form with existing data
+        setFormData({
+          name: data.name || "",
+          legalName: data.legalName || "",
+          taxNumber: data.taxNumber || "",
+          currency: data.currency || "USD",
+          taxRate: data.taxRate || 0,
+          address: data.address || "",
+          phone: data.phone || "",
+          website: data.website || "",
+          logoUrl: data.logoUrl || "",
+          primaryColor: data.primaryColor || "#3B82F6",
+          secondaryColor: data.secondaryColor || "#1E40AF",
+          accentColor: data.accentColor || "#F59E0B",
+        });
+        // Set logo preview if logoUrl exists
+        if (data.logoUrl) {
+          setLogoPreview(data.logoUrl);
+        }
+      }
     } catch (err: any) {
       // If no business exists yet, that's okay - we'll create one
       if (err.message?.includes("not found") || err.response?.status === 404) {
@@ -65,8 +76,8 @@ export default function BusinessManagement() {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: FormEvent) => {
+    e?.preventDefault();
     setError("");
     setSuccess("");
     setIsSaving(true);
@@ -82,6 +93,7 @@ export default function BusinessManagement() {
         setSuccess("Business profile created successfully!");
       }
       await fetchBusiness();
+      await refreshBusiness(); // Refresh context to update sidebar/favicon/colors
       setIsEditing(false);
     } catch (err: any) {
       setError(err.message || "Failed to save business");
@@ -92,6 +104,57 @@ export default function BusinessManagement() {
 
   const handleChange = (field: keyof CreateBusinessDto, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size must be less than 5MB");
+        return;
+      }
+      // Validate file type
+      if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
+        setError("Only image files (JPG, PNG, GIF, WEBP) are allowed");
+        return;
+      }
+      setSelectedFile(file);
+      setError("");
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setLogoPreview(previewUrl);
+    }
+  };
+
+  const handleLogoUpload = async () => {
+    if (!selectedFile) {
+      setError("Please select a file first");
+      return;
+    }
+    setIsUploading(true);
+    setError("");
+    try {
+      const result = await businessService.uploadLogo(selectedFile);
+      setFormData((prev) => ({ ...prev, logoUrl: result.logoUrl }));
+      setLogoPreview(result.logoUrl);
+      setSuccess("Logo uploaded successfully!");
+      setSelectedFile(null);
+      // Refresh business data in context (updates sidebar, favicon, colors)
+      await refreshBusiness();
+    } catch (err: any) {
+      setError(err.message || "Failed to upload logo");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const clearLogoPreview = () => {
+    setLogoPreview(null);
+    setSelectedFile(null);
+    if (formData.logoUrl) {
+      setFormData((prev) => ({ ...prev, logoUrl: "" }));
+    }
   };
 
   if (isLoading) {
@@ -154,7 +217,6 @@ export default function BusinessManagement() {
                   value={formData.name}
                   onChange={(e) => handleChange("name", e.target.value)}
                   disabled={!isEditing && !!business}
-                  required
                 />
               </div>
               <div>
@@ -200,7 +262,7 @@ export default function BusinessManagement() {
                   disabled={!isEditing && !!business}
                   min="0"
                   max="100"
-                  step="0.01"
+                  step={0.01}
                 />
               </div>
               <div>
@@ -240,29 +302,85 @@ export default function BusinessManagement() {
               Branding
             </h2>
             <div className="space-y-6">
-              {/* Logo URL */}
+              {/* Logo Upload */}
               <div>
-                <Label>Logo URL</Label>
-                <Input
-                  type="url"
-                  value={formData.logoUrl}
-                  onChange={(e) => handleChange("logoUrl", e.target.value)}
-                  disabled={!isEditing && !!business}
-                  placeholder="https://example.com/logo.png"
-                />
-                {formData.logoUrl && (
-                  <div className="mt-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Logo Preview:</p>
-                    <img
-                      src={formData.logoUrl}
-                      alt="Logo preview"
-                      className="h-16 w-auto object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  </div>
-                )}
+                <Label>Business Logo</Label>
+                <div className="mt-2">
+                  {(logoPreview || formData.logoUrl) && (
+                    <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center gap-4">
+                      <img
+                        src={logoPreview || formData.logoUrl}
+                        alt="Logo preview"
+                        className="h-16 w-16 object-contain rounded-lg border border-gray-200 dark:border-gray-600"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          Current Logo
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {selectedFile ? selectedFile.name : "Uploaded logo"}
+                        </p>
+                      </div>
+                      {(isEditing || !business) && (
+                        <button
+                          type="button"
+                          onClick={clearLogoPreview}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  
+                  {(isEditing || !business) && (
+                    <div className="flex items-center gap-3">
+                      <label className="flex-1">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp"
+                          onChange={handleFileChange}
+                          className="hidden"
+                          id="logo-upload"
+                        />
+                        <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-gray-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {selectedFile ? selectedFile.name : "Choose logo file"}
+                          </span>
+                        </div>
+                      </label>
+                      {selectedFile && (
+                        <Button
+                          onClick={handleLogoUpload}
+                          disabled={isUploading}
+                          variant="primary"
+                        >
+                          {isUploading ? "Uploading..." : "Upload"}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Supported formats: JPG, PNG, GIF, WEBP. Max size: 5MB
+                  </p>
+                </div>
               </div>
 
               {/* Colors */}
@@ -370,7 +488,6 @@ export default function BusinessManagement() {
             <div className="flex justify-end gap-4">
               {business && (
                 <Button
-                  type="button"
                   variant="outline"
                   onClick={() => {
                     setIsEditing(false);
@@ -390,13 +507,17 @@ export default function BusinessManagement() {
                         secondaryColor: business.secondaryColor || "#1E40AF",
                         accentColor: business.accentColor || "#F59E0B",
                       });
+                      setLogoPreview(business.logoUrl || null);
                     }
                   }}
                 >
                   Cancel
                 </Button>
               )}
-              <Button type="submit" disabled={isSaving}>
+              <Button
+                onClick={() => handleSubmit()}
+                disabled={isSaving}
+              >
                 {isSaving ? "Saving..." : business ? "Save Changes" : "Create Business Profile"}
               </Button>
             </div>

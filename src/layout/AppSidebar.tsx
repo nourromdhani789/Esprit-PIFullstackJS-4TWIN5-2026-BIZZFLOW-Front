@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import { useBusiness } from "../contexts/BusinessContext";
 
 // Assume these icons are imported from an icon library
 import {
@@ -62,6 +63,12 @@ const AppSidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { business } = useBusiness();
+
+  // Get logo URL from business or fallback to default
+  const logoUrl = business?.logoUrl 
+    ? `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${business.logoUrl}`
+    : null;
 
   // Build nav items dynamically based on user role
   const getNavItems = (): NavItem[] => {
@@ -350,28 +357,50 @@ const AppSidebar: React.FC = () => {
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <img
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
-              <img
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
+              {logoUrl ? (
+                <img
+                  className="max-h-10 object-contain"
+                  src={logoUrl}
+                  alt="Business Logo"
+                  width={150}
+                  height={40}
+                />
+              ) : (
+                <>
+                  <img
+                    className="dark:hidden"
+                    src="/images/logo/logo.svg"
+                    alt="Logo"
+                    width={150}
+                    height={40}
+                  />
+                  <img
+                    className="hidden dark:block"
+                    src="/images/logo/logo-dark.svg"
+                    alt="Logo"
+                    width={150}
+                    height={40}
+                  />
+                </>
+              )}
             </>
           ) : (
-            <img
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-            />
+            logoUrl ? (
+              <img
+                className="max-h-8 object-contain"
+                src={logoUrl}
+                alt="Business Logo"
+                width={32}
+                height={32}
+              />
+            ) : (
+              <img
+                src="/images/logo/logo-icon.svg"
+                alt="Logo"
+                width={32}
+                height={32}
+              />
+            )
           )}
         </Link>
       </div>

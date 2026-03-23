@@ -69,4 +69,21 @@ export const businessService = {
       throw new Error(axiosError.response?.data?.message || 'Failed to update business');
     }
   },
+
+  async uploadLogo(file: File): Promise<{ logoUrl: string; message: string }> {
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+      
+      const response = await api.post('/businesses/upload-logo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to upload logo');
+    }
+  },
 };
