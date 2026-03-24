@@ -26,6 +26,10 @@ import Home from "./pages/Dashboard/Home";
 import TeamInvitations from "./pages/TeamInvitations";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import BusinessManagement from "./pages/BusinessManagement";
+import InvoiceList from "./pages/InvoiceList";
+import CreateInvoice from "./pages/CreateInvoice";
+import InvoiceDetail from "./pages/InvoiceDetail";
+import ProductManagement from "./pages/ProductManagement";
 
 // Wrapper component for protected dashboard routes
 const DashboardLayout = () => (
@@ -70,6 +74,12 @@ export default function App() {
             {/* Team Management - Visible to all for now */}
             <Route path="/team-invitations" element={<TeamInvitations />} />
             <Route path="/business-management" element={<BusinessManagement />} />
+
+            {/* Sprint 3 - Invoice System */}
+            <Route path="/invoices" element={<InvoiceList />} />
+            <Route path="/invoices/create" element={<CreateInvoice />} />
+            <Route path="/invoices/:id" element={<InvoiceDetail />} />
+            <Route path="/products" element={<ProductManagement />} />
           </Route>
 
           {/* Auth Layout - Public Routes */}
