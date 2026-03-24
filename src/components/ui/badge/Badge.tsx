@@ -1,6 +1,6 @@
-type BadgeVariant = "light" | "solid";
-type BadgeSize = "sm" | "md";
-type BadgeColor =
+export type BadgeVariant = "light" | "solid";
+export type BadgeSize = "sm" | "md";
+export type BadgeColor =
   | "primary"
   | "success"
   | "error"
