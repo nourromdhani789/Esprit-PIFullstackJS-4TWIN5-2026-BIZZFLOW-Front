@@ -33,7 +33,7 @@ export default function ExpenseList() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const isAdmin = user?.roleId === "admin" || user?.roleId === "owner";
+  const isAdmin = user?.roleId === "PLATFORM_ADMIN" || user?.roleId === "BUSINESS_OWNER" || user?.roleId === "BUSINESS_ADMIN";
 
   const fetchExpenses = async () => {
     try {
