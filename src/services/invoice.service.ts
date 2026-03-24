@@ -70,6 +70,16 @@ export interface SendInvoiceEmailDto {
   message?: string;
 }
 
+export interface ScanInvoiceResponse {
+  scanUrl: string;
+  aiExtracted: {
+    totalAmount: number;
+    date: string;
+    clientName: string;
+    confidence: number;
+  };
+}
+
 class InvoiceService {
   async getInvoices(): Promise<Invoice[]> {
     const response = await api.get('/invoices');
@@ -109,6 +119,18 @@ class InvoiceService {
 
   async sendInvoiceEmail(id: string, data: SendInvoiceEmailDto): Promise<{ message: string }> {
     const response = await api.post(`/invoices/${id}/send-email`, data);
+    return response.data;
+  }
+
+  async uploadScan(file: File): Promise<ScanInvoiceResponse> {
+    const formData = new FormData();
+    formData.append('document', file);
+    
+    const response = await api.post('/invoices/upload-scan', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   }
 

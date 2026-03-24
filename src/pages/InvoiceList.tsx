@@ -98,9 +98,14 @@ export default function InvoiceList() {
               Manage and track your invoices
             </p>
           </div>
-          <Button onClick={() => navigate("/invoices/create")}>
-            + Create Invoice
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate("/invoices/scan")}>
+              Upload & Scan
+            </Button>
+            <Button onClick={() => navigate("/invoices/create")}>
+              + Create Invoice
+            </Button>
+          </div>
         </div>
 
         {error && (

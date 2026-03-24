@@ -29,7 +29,11 @@ import BusinessManagement from "./pages/BusinessManagement";
 import InvoiceList from "./pages/InvoiceList";
 import CreateInvoice from "./pages/CreateInvoice";
 import InvoiceDetail from "./pages/InvoiceDetail";
+import InvoiceScan from "./pages/InvoiceScan";
 import ProductManagement from "./pages/ProductManagement";
+import ExpenseList from "./pages/ExpenseList";
+import UploadReceipt from "./pages/UploadReceipt";
+import CreateExpense from "./pages/CreateExpense";
 
 // Wrapper component for protected dashboard routes
 const DashboardLayout = () => (
@@ -78,8 +82,14 @@ export default function App() {
             {/* Sprint 3 - Invoice System */}
             <Route path="/invoices" element={<InvoiceList />} />
             <Route path="/invoices/create" element={<CreateInvoice />} />
+            <Route path="/invoices/scan" element={<InvoiceScan />} />
             <Route path="/invoices/:id" element={<InvoiceDetail />} />
             <Route path="/products" element={<ProductManagement />} />
+
+            {/* Sprint 4 - Expense Management */}
+            <Route path="/expenses" element={<ExpenseList />} />
+            <Route path="/expenses/create" element={<CreateExpense />} />
+            <Route path="/expenses/upload" element={<UploadReceipt />} />
           </Route>
 
           {/* Auth Layout - Public Routes */}
