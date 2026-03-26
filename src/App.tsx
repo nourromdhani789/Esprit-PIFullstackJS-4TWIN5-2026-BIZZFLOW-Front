@@ -35,6 +35,14 @@ import ExpenseList from "./pages/ExpenseList";
 import UploadReceipt from "./pages/UploadReceipt";
 import CreateExpense from "./pages/CreateExpense";
 
+// Sprint 6 - Stock & Financial Management
+import StockManagement from "./pages/StockManagement";
+import StockMovement from "./pages/StockMovement";
+import PurchaseOrders from "./pages/PurchaseOrders";
+import Payments from "./pages/Payments";
+import CreditNotes from "./pages/CreditNotes";
+import StockTake from "./pages/StockTake";
+
 // Wrapper component for protected dashboard routes
 const DashboardLayout = () => (
   <ProtectedRoute>
@@ -90,6 +98,14 @@ export default function App() {
             <Route path="/expenses" element={<ExpenseList />} />
             <Route path="/expenses/create" element={<CreateExpense />} />
             <Route path="/expenses/upload" element={<UploadReceipt />} />
+
+            {/* Sprint 6 - Stock & Financial Management */}
+            <Route path="/stock" element={<StockManagement />} />
+            <Route path="/stock-movements" element={<StockMovement />} />
+            <Route path="/purchase-orders" element={<PurchaseOrders />} />
+            <Route path="/stock-take" element={<StockTake />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/credit-notes" element={<CreditNotes />} />
           </Route>
 
           {/* Auth Layout - Public Routes */}
