@@ -202,7 +202,13 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    fetchBusiness();
+    // Only fetch business data if user is authenticated
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      fetchBusiness();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   return (

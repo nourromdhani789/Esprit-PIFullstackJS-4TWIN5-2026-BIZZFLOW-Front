@@ -18,6 +18,8 @@ interface ProductFormData {
   price: string;
   category: string;
   description: string;
+  initialQuantity: string;
+  minimumStock: string;
 }
 
 export default function ProductManagement() {
@@ -32,6 +34,8 @@ export default function ProductManagement() {
     price: "",
     category: "",
     description: "",
+    initialQuantity: "",
+    minimumStock: "",
   });
 
   const fetchProducts = async () => {
@@ -60,6 +64,8 @@ export default function ProductManagement() {
         price: product.price.toString(),
         category: product.category || "",
         description: product.description || "",
+        initialQuantity: "",
+        minimumStock: product.minimumStock?.toString() || "",
       });
     } else {
       setIsEditing(false);
@@ -69,6 +75,8 @@ export default function ProductManagement() {
         price: "",
         category: "",
         description: "",
+        initialQuantity: "",
+        minimumStock: "",
       });
     }
     setIsModalOpen(true);
@@ -91,6 +99,8 @@ export default function ProductManagement() {
         price: parseFloat(formData.price) || 0,
         category: formData.category || undefined,
         description: formData.description || undefined,
+        initialQuantity: formData.initialQuantity ? parseInt(formData.initialQuantity) : undefined,
+        minimumStock: formData.minimumStock ? parseInt(formData.minimumStock) : undefined,
       };
 
       if (isEditing && currentProduct) {
@@ -279,6 +289,30 @@ export default function ProductManagement() {
                 placeholder="Product description..."
                 className="w-full h-24 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white resize-none"
               />
+            </div>
+
+            {!isEditing && (
+              <div>
+                <Label>Initial Quantity</Label>
+                <Input
+                  type="number"
+                  value={formData.initialQuantity}
+                  onChange={(e) => handleChange("initialQuantity", e.target.value)}
+                  placeholder="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">Starting stock quantity for this product</p>
+              </div>
+            )}
+
+            <div>
+              <Label>Minimum Stock Level</Label>
+              <Input
+                type="number"
+                value={formData.minimumStock}
+                onChange={(e) => handleChange("minimumStock", e.target.value)}
+                placeholder="0"
+              />
+              <p className="text-xs text-gray-500 mt-1">Alert when stock falls below this level</p>
             </div>
           </div>
 
