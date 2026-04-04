@@ -15,7 +15,7 @@ export interface PurchaseOrder {
 }
 
 export interface CreatePurchaseOrderDto {
-  supplierName: string;
+  supplierId: string;
   totalAmount: number;
   status?: 'pending' | 'received' | 'cancelled';
   date?: Date;
@@ -23,7 +23,7 @@ export interface CreatePurchaseOrderDto {
 }
 
 export interface UpdatePurchaseOrderDto {
-  supplierName?: string;
+  supplierId?: string;
   totalAmount?: number;
   status?: 'pending' | 'received' | 'cancelled';
   notes?: string;

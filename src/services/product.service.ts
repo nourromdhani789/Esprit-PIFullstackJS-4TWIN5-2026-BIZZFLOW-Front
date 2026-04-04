@@ -6,6 +6,10 @@ export interface Product {
   price: number;
   category?: string;
   description?: string;
+  quantity: number;
+  minimumStock?: number;
+  usedFor: 'sales' | 'purchases' | 'both';
+  productType: 'storable' | 'consumable' | 'service';
   businessId: string;
   createdAt: string;
   updatedAt: string;
@@ -16,6 +20,10 @@ export interface CreateProductDto {
   price: number;
   category?: string;
   description?: string;
+  initialQuantity?: number;
+  minimumStock?: number;
+  usedFor?: 'sales' | 'purchases' | 'both';
+  productType?: 'storable' | 'consumable' | 'service';
 }
 
 export interface UpdateProductDto {
@@ -23,11 +31,24 @@ export interface UpdateProductDto {
   price?: number;
   category?: string;
   description?: string;
+  minimumStock?: number;
+  usedFor?: 'sales' | 'purchases' | 'both';
+  productType?: 'storable' | 'consumable' | 'service';
 }
 
 class ProductService {
   async getProducts(): Promise<Product[]> {
     const response = await api.get('/products');
+    return response.data;
+  }
+
+  async getProductsForSales(): Promise<Product[]> {
+    const response = await api.get('/products/for-sales');
+    return response.data;
+  }
+
+  async getProductsForPurchases(): Promise<Product[]> {
+    const response = await api.get('/products/for-purchases');
     return response.data;
   }
 

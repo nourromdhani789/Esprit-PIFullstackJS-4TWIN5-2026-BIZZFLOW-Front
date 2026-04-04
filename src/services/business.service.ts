@@ -14,6 +14,8 @@ export interface Business {
   logoUrl?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  navbarColor?: string;
+  sidebarColor?: string;
   accentColor?: string;
   status: string;
   tenantId: string;
@@ -33,6 +35,8 @@ export interface CreateBusinessDto {
   logoUrl?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  navbarColor?: string;
+  sidebarColor?: string;
   accentColor?: string;
 }
 
@@ -40,7 +44,12 @@ export const businessService = {
   async getMyBusiness(): Promise<Business | null> {
     try {
       const response = await api.get('/businesses/my-business');
-      return response.data;
+      const data = response.data;
+      // Ensure taxRate is a number
+      if (data && data.taxRate !== undefined && data.taxRate !== null) {
+        data.taxRate = Number(data.taxRate);
+      }
+      return data;
     } catch (error: any) {
       if (error.response?.status === 404) {
         return null;

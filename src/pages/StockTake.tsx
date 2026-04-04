@@ -1,15 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { stockTakeService, StockTake, StockTakeItem } from '../services/stock-take.service';
 import { productService } from '../services/product.service';
 import PageMeta from '../components/common/PageMeta';
 import PageBreadcrumb from '../components/common/PageBreadCrumb';
 import Button from '../components/ui/button/Button';
+import Label from '../components/form/Label';
+import Input from '../components/form/input/InputField';
+import { Modal } from '../components/ui/modal';
 
 export default function StockTakePage() {
   const [stockTakes, setStockTakes] = useState<StockTake[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [activeStockTake, setActiveStockTake] = useState<{ stockTake: StockTake; items: StockTakeItem[] } | null>(null);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleCloseCountModal = () => {
+    setActiveStockTake(null);
+  };
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -32,7 +43,7 @@ export default function StockTakePage() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
     try {
       await stockTakeService.create({
@@ -232,59 +243,55 @@ export default function StockTakePage() {
         </div>
 
         {/* Create Stock Take Modal */}
-        {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">New Stock Take</h2>
-              <form onSubmit={handleCreate} className="space-y-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="e.g., Monthly Inventory Count"
-                  />
-                </div>
+        <Modal isOpen={showModal} onClose={handleCloseModal} className="max-w-md">
+          <div className="p-6">
+            <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">New Stock Take</h2>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <Label>Name</Label>
+                <Input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g., Monthly Inventory Count"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Description (Optional)</label>
-                  <textarea
-                    rows={2}
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
+              <div>
+                <Label>Description (Optional)</Label>
+                <textarea
+                  rows={2}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Count Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.countDate}
-                    onChange={(e) => setFormData({ ...formData, countDate: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
+              <div>
+                <Label>Count Date</Label>
+                <Input
+                  type="date"
+                  required
+                  value={formData.countDate}
+                  onChange={(e) => setFormData({ ...formData, countDate: e.target.value })}
+                />
+              </div>
 
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">Create Stock Take</Button>
-                </div>
-              </form>
-            </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={handleCloseModal}>
+                  Cancel
+                </Button>
+                <Button type="submit">Create Stock Take</Button>
+              </div>
+            </form>
           </div>
-        )}
+        </Modal>
 
         {/* Counting Modal */}
-        {activeStockTake && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+        <Modal isOpen={!!activeStockTake} onClose={handleCloseCountModal} className="max-w-4xl">
+          {activeStockTake && (
+            <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">{activeStockTake.stockTake.name}</h2>
@@ -295,14 +302,6 @@ export default function StockTakePage() {
                     )}
                   </p>
                 </div>
-                <button
-                  onClick={() => setActiveStockTake(null)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
               </div>
 
               <div className="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -332,7 +331,7 @@ export default function StockTakePage() {
               </div>
 
               <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Button type="button" variant="outline" onClick={() => setActiveStockTake(null)}>
+                <Button type="button" variant="outline" onClick={handleCloseCountModal}>
                   Save & Close
                 </Button>
                 <Button type="button" variant="outline" onClick={() => handleComplete(false)}>
@@ -343,8 +342,8 @@ export default function StockTakePage() {
                 </Button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </Modal>
       </div>
     </>
   );

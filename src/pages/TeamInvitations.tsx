@@ -402,6 +402,7 @@ export default function TeamInvitations() {
 
             <div className="flex gap-3 pt-4">
               <Button
+                type="button"
                 variant="outline"
                 onClick={() => setIsModalOpen(false)}
                 className="flex-1"
@@ -409,6 +410,7 @@ export default function TeamInvitations() {
                 Cancel
               </Button>
               <Button
+                type="submit"
                 disabled={!email || isSubmitting}
                 className="flex-1 bg-brand-500 hover:bg-brand-600 text-white disabled:opacity-50"
               >

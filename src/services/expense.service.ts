@@ -7,7 +7,13 @@ export interface Expense {
   date: string;
   receiptUrl?: string;
   status: 'pending' | 'approved' | 'rejected';
-  supplier?: string;
+  supplierId?: string;
+  supplier?: {
+    id: string;
+    name: string;
+    email?: string;
+    phone?: string;
+  };
   description?: string;
   businessId: string;
   createdAt: string;
@@ -18,7 +24,7 @@ export interface CreateExpenseData {
   category: string;
   date: string;
   receiptUrl?: string;
-  supplier?: string;
+  supplierId?: string;
   description?: string;
 }
 
@@ -27,7 +33,7 @@ export interface UpdateExpenseData {
   category?: string;
   date?: string;
   receiptUrl?: string;
-  supplier?: string;
+  supplierId?: string;
   description?: string;
   status?: 'pending' | 'approved' | 'rejected';
 }
@@ -37,7 +43,8 @@ export interface ScanReceiptResponse {
   aiExtracted: {
     amount: number;
     date: string;
-    supplier: string;
+    supplierId?: string;
+    supplier?: string;
     confidence: number;
   };
 }

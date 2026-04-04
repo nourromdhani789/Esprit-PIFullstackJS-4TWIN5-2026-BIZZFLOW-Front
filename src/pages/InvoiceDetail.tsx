@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { invoiceService, Invoice } from "../services/invoice.service";
+import { useBusiness } from "../contexts/BusinessContext";
 import Button from "../components/ui/button/Button";
 import Badge from "../components/ui/badge/Badge";
 
@@ -14,13 +15,19 @@ const statusColors = {
 export default function InvoiceDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { formatCurrency } = useBusiness();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [emailData, setEmailData] = useState({ email: "", subject: "", message: "" });
-  const [emailSuccess, setEmailSuccess] = useState("");
+  const [emailData, setEmailData] = useState({ email: "", message: "" });
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 5000);
+  };
 
   const fetchInvoice = async () => {
     if (!id) return;
@@ -67,24 +74,45 @@ export default function InvoiceDetail() {
     }
   };
 
-  const handleSendEmail = async () => {
-    if (!invoice || !emailData.email) return;
+  const handleSendEmailClick = async () => {
+    if (!invoice) return;
+    
+    // If client has email, send directly without modal
+    if (invoice.client?.email) {
+      await sendEmailDirectly(invoice.client.email);
+    } else {
+      // Open modal for missing email
+      setShowEmailModal(true);
+    }
+  };
+
+  const sendEmailDirectly = async (email: string) => {
+    if (!invoice) return;
     try {
       setIsSendingEmail(true);
       setError("");
-      await invoiceService.sendInvoiceEmail(invoice.id, {
-        email: emailData.email,
-        subject: emailData.subject || undefined,
+      const response = await invoiceService.sendInvoiceEmail(invoice.id, {
+        email,
         message: emailData.message || undefined,
       });
-      setEmailSuccess("Invoice sent successfully!");
+      showToast('success', response.message || `Invoice sent successfully to ${email}`);
+      setEmailData({ email: "", message: "" });
       setShowEmailModal(false);
-      setEmailData({ email: "", subject: "", message: "" });
+      await fetchInvoice(); // Refresh to show updated client email
     } catch (err: any) {
-      setError(err.message || "Failed to send invoice");
+      const errorMsg = err.response?.data?.message || err.message || "Failed to send invoice";
+      if (errorMsg.includes('no email') || errorMsg.includes('provide')) {
+        setShowEmailModal(true);
+      }
+      showToast('error', errorMsg);
     } finally {
       setIsSendingEmail(false);
     }
+  };
+
+  const handleSendEmailFromModal = async () => {
+    if (!emailData.email) return;
+    await sendEmailDirectly(emailData.email);
   };
 
   if (isLoading) {
@@ -134,17 +162,21 @@ export default function InvoiceDetail() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => setShowEmailModal(true)}
-              disabled={!invoice.clientEmail && !emailData.email}
+              onClick={handleSendEmailClick}
+              disabled={isSendingEmail}
             >
-              Send Email
+              {isSendingEmail ? "Sending..." : "Send Email"}
             </Button>
           </div>
         </div>
 
-        {emailSuccess && (
-          <div className="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-900/30 dark:text-green-400">
-            {emailSuccess}
+        {toast && (
+          <div className={`mb-4 p-4 text-sm rounded-lg ${
+            toast.type === 'success' 
+              ? 'text-green-700 bg-green-100 dark:bg-green-900/30 dark:text-green-400' 
+              : 'text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-400'
+          }`}>
+            {toast.message}
           </div>
         )}
 
@@ -182,10 +214,10 @@ export default function InvoiceDetail() {
                 Bill To
               </h3>
               <p className="font-semibold text-gray-900 dark:text-white">
-                {invoice.clientName || "Client"}
+                {invoice.client?.name || "Client"}
               </p>
-              {invoice.clientEmail && (
-                <p className="text-gray-600 dark:text-gray-400">{invoice.clientEmail}</p>
+              {invoice.client?.email && (
+                <p className="text-gray-600 dark:text-gray-400">{invoice.client.email}</p>
               )}
             </div>
             <div>
@@ -241,10 +273,10 @@ export default function InvoiceDetail() {
                     {item.quantity}
                   </td>
                   <td className="px-4 py-3 text-right text-gray-900 dark:text-white">
-                    ${Number(item.price).toFixed(2)}
+                    {formatCurrency(Number(item.price))}
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-white">
-                    ${Number(item.total).toFixed(2)}
+                    {formatCurrency(Number(item.total))}
                   </td>
                 </tr>
               ))}
@@ -255,22 +287,22 @@ export default function InvoiceDetail() {
             <div className="w-72 space-y-3">
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Subtotal:</span>
-                <span>${Number(invoice.subtotal).toFixed(2)}</span>
+                <span>{formatCurrency(Number(invoice.subtotal))}</span>
               </div>
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Tax:</span>
-                <span>${Number(invoice.taxAmount).toFixed(2)}</span>
+                <span>{formatCurrency(Number(invoice.taxAmount))}</span>
               </div>
               <div className="flex justify-between text-xl font-bold text-gray-900 dark:text-white pt-3 border-t border-gray-200 dark:border-gray-700">
                 <span>Total:</span>
-                <span>${Number(invoice.totalAmount).toFixed(2)}</span>
+                <span>{formatCurrency(Number(invoice.totalAmount))}</span>
               </div>
             </div>
           </div>
         </div>
 
         {invoice.notes && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Notes
             </h2>
@@ -278,13 +310,34 @@ export default function InvoiceDetail() {
           </div>
         )}
 
-        {/* Send Email Modal */}
+        {(invoice.sourceQuoteId || invoice.sourceSalesOrderId) && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-6">
+            <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
+              Source Document
+            </h2>
+            {invoice.sourceQuoteId && (
+              <p className="text-blue-700 dark:text-blue-400">
+                Created from Quote: <button className="underline font-medium" onClick={() => navigate(`/quotes/${invoice.sourceQuoteId}`)}>View →</button>
+              </p>
+            )}
+            {invoice.sourceSalesOrderId && (
+              <p className="text-blue-700 dark:text-blue-400">
+                Created from Sales Order: <button className="underline font-medium" onClick={() => navigate(`/sales-orders/${invoice.sourceSalesOrderId}`)}>View →</button>
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Send Email Modal - Only shown when client has no email */}
         {showEmailModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Send Invoice via Email
               </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                This client has no email address. Please provide one to send the invoice.
+              </p>
 
               <div className="space-y-4">
                 <div>
@@ -296,19 +349,6 @@ export default function InvoiceDetail() {
                     value={emailData.email}
                     onChange={(e) => setEmailData({ ...emailData, email: e.target.value })}
                     placeholder="client@example.com"
-                    className="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Subject (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={emailData.subject}
-                    onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })}
-                    placeholder={`Invoice #${invoice.invoiceNumber}`}
                     className="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
@@ -335,7 +375,7 @@ export default function InvoiceDetail() {
                   Cancel
                 </Button>
                 <Button
-                  onClick={handleSendEmail}
+                  onClick={handleSendEmailFromModal}
                   disabled={!emailData.email || isSendingEmail}
                 >
                   {isSendingEmail ? "Sending..." : "Send Email"}

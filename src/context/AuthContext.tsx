@@ -37,6 +37,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     const response = await authService.login({ email, password });
     setUser(response.user);
+    // Dispatch event to notify BusinessContext to fetch business data
+    window.dispatchEvent(new Event('auth-login'));
   };
 
   const logout = () => {

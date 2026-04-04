@@ -100,7 +100,7 @@ export default function StockManagement() {
                       </span>
                     </td>
                     <td className="px-6 py-4">{product.minimumStock}</td>
-                    <td className="px-6 py-4">${product.price}</td>
+                    <td className="px-6 py-4">TND {product.price}</td>
                     <td className="px-6 py-4">
                       {isLowStock(product) ? (
                         <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
@@ -136,7 +136,7 @@ export default function StockManagement() {
                       </span>
                     </div>
                     <p className="mt-1 text-sm text-red-600 dark:text-red-300">
-                      Minimum: {product.minimumStock} | Price: ${product.price}
+                      Minimum: {product.minimumStock} | Price: TND {product.price}
                     </p>
                   </div>
                 ))}

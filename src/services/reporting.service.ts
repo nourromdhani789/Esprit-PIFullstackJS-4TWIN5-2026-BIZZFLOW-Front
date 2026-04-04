@@ -34,11 +34,21 @@ export interface RecentExpense {
   createdAt: string;
 }
 
+export interface TopClient {
+  clientId: string;
+  clientName: string;
+  totalInvoiced: number;
+  totalPaid: number;
+  outstandingBalance: number;
+  invoiceCount: number;
+}
+
 export interface DashboardData {
   kpis: KPIData;
   monthlyTrend: MonthlyData[];
   recentInvoices: RecentInvoice[];
   recentExpenses: RecentExpense[];
+  topClients: TopClient[];
 }
 
 export interface ReportSummary {

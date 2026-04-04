@@ -7,7 +7,7 @@ import Label from "../components/form/Label";
 import Input from "../components/form/input/InputField";
 
 export default function BusinessManagement() {
-  const { refreshBusiness } = useBusiness();
+  const { refreshBusiness, updateBusinessColors } = useBusiness();
   const [business, setBusiness] = useState<Business | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -30,7 +30,9 @@ export default function BusinessManagement() {
     website: "",
     logoUrl: "",
     primaryColor: "#3B82F6",
-    secondaryColor: "#1E40AF",
+    secondaryColor: "#FFFFFF",
+    navbarColor: "#FFFFFF",
+    sidebarColor: "#FFFFFF",
     accentColor: "#F59E0B",
   });
 
@@ -56,7 +58,9 @@ export default function BusinessManagement() {
           website: data.website || "",
           logoUrl: data.logoUrl || "",
           primaryColor: data.primaryColor || "#3B82F6",
-          secondaryColor: data.secondaryColor || "#1E40AF",
+          secondaryColor: data.secondaryColor || "#FFFFFF",
+          navbarColor: data.navbarColor || "#FFFFFF",
+          sidebarColor: data.sidebarColor || "#FFFFFF",
           accentColor: data.accentColor || "#F59E0B",
         });
         // Set logo preview if logoUrl exists
@@ -103,7 +107,19 @@ export default function BusinessManagement() {
   };
 
   const handleChange = (field: keyof CreateBusinessDto, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    const nextFormData = { ...formData, [field]: value };
+    setFormData(nextFormData);
+
+    // Instant branding preview while editing
+    if (field === 'primaryColor' || field === 'secondaryColor' || field === 'navbarColor' || field === 'sidebarColor' || field === 'accentColor') {
+      updateBusinessColors({
+        primaryColor: nextFormData.primaryColor,
+        secondaryColor: nextFormData.secondaryColor,
+        navbarColor: nextFormData.navbarColor,
+        sidebarColor: nextFormData.sidebarColor,
+        accentColor: nextFormData.accentColor,
+      });
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,7 +221,13 @@ export default function BusinessManagement() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Company Information Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+          <div
+            className="rounded-xl p-6 shadow-sm"
+            style={{
+              backgroundColor: 'var(--color-panel-bg, #ffffff)',
+              color: 'var(--color-panel-text, #111827)',
+            }}
+          >
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Company Information
             </h2>
@@ -297,7 +319,13 @@ export default function BusinessManagement() {
           </div>
 
           {/* Branding Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+          <div
+            className="rounded-xl p-6 shadow-sm"
+            style={{
+              backgroundColor: 'var(--color-panel-bg, #ffffff)',
+              color: 'var(--color-panel-text, #111827)',
+            }}
+          >
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Branding
             </h2>
@@ -384,7 +412,7 @@ export default function BusinessManagement() {
               </div>
 
               {/* Colors */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label>Primary Color</Label>
                   <div className="flex items-center gap-3">
@@ -426,10 +454,54 @@ export default function BusinessManagement() {
                     />
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Used for headers and secondary elements
+                    Used for panel backgrounds and base app background
                   </p>
                 </div>
                 <div>
+                  <Label>Navbar Color</Label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={formData.navbarColor}
+                      onChange={(e) => handleChange("navbarColor", e.target.value)}
+                      disabled={!isEditing && !!business}
+                      className="h-10 w-20 rounded cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={formData.navbarColor}
+                      onChange={(e) => handleChange("navbarColor", e.target.value)}
+                      disabled={!isEditing && !!business}
+                      className="flex-1"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Used for the top navigation bar background
+                  </p>
+                </div>
+                <div>
+                  <Label>Sidebar Color</Label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={formData.sidebarColor}
+                      onChange={(e) => handleChange("sidebarColor", e.target.value)}
+                      disabled={!isEditing && !!business}
+                      className="h-10 w-20 rounded cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={formData.sidebarColor}
+                      onChange={(e) => handleChange("sidebarColor", e.target.value)}
+                      disabled={!isEditing && !!business}
+                      className="flex-1"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Used for the left sidebar background
+                  </p>
+                </div>
+                <div className="md:col-span-2">
                   <Label>Accent Color</Label>
                   <div className="flex items-center gap-3">
                     <input
@@ -448,32 +520,59 @@ export default function BusinessManagement() {
                     />
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Used for highlights and special elements
+                    Used for highlights, warnings, and special elements (e.g., warning messages, focus states, badges)
                   </p>
                 </div>
               </div>
 
               {/* Color Preview */}
-              <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Color Preview:</p>
+              <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-panel-bg, #f8fafc)', color: 'var(--color-panel-text, #1f2937)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-medium">Color Preview</p>
+                  <button
+                    type="button"
+                    className="px-3 py-1 text-xs font-semibold rounded-lg border border-gray-300 hover:bg-gray-100"
+                    onClick={() => {
+                      const defaults = { primaryColor: '#3B82F6', secondaryColor: '#FFFFFF', navbarColor: '#FFFFFF', sidebarColor: '#FFFFFF', accentColor: '#F59E0B' };
+                      setFormData((prev) => ({ ...prev, ...defaults }));
+                      updateBusinessColors(defaults);
+                    }}
+                  >
+                    Reset Default Colors
+                  </button>
+                </div>
                 <div className="flex gap-4 flex-wrap">
                   <div className="text-center">
                     <div
-                      className="w-16 h-16 rounded-lg shadow-sm"
+                      className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
                       style={{ backgroundColor: formData.primaryColor }}
                     ></div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Primary</span>
                   </div>
                   <div className="text-center">
                     <div
-                      className="w-16 h-16 rounded-lg shadow-sm"
+                      className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
                       style={{ backgroundColor: formData.secondaryColor }}
                     ></div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Secondary</span>
                   </div>
                   <div className="text-center">
                     <div
-                      className="w-16 h-16 rounded-lg shadow-sm"
+                      className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
+                      style={{ backgroundColor: formData.navbarColor }}
+                    ></div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Navbar</span>
+                  </div>
+                  <div className="text-center">
+                    <div
+                      className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
+                      style={{ backgroundColor: formData.sidebarColor }}
+                    ></div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Sidebar</span>
+                  </div>
+                  <div className="text-center">
+                    <div
+                      className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
                       style={{ backgroundColor: formData.accentColor }}
                     ></div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Accent</span>
@@ -504,7 +603,9 @@ export default function BusinessManagement() {
                         website: business.website || "",
                         logoUrl: business.logoUrl || "",
                         primaryColor: business.primaryColor || "#3B82F6",
-                        secondaryColor: business.secondaryColor || "#1E40AF",
+                        secondaryColor: business.secondaryColor || "#FFFFFF",
+                        navbarColor: business.navbarColor || "#FFFFFF",
+                        sidebarColor: business.sidebarColor || "#FFFFFF",
                         accentColor: business.accentColor || "#F59E0B",
                       });
                       setLogoPreview(business.logoUrl || null);
