@@ -386,7 +386,7 @@ export default function InvoiceScan() {
                           />
                         </TableCell>
                         <TableCell className="px-4 py-2 text-right text-gray-900 dark:text-white font-medium">
-                          ${(item.quantity * item.price).toFixed(2)}
+                          TND {(item.quantity * item.price).toFixed(2)}
                         </TableCell>
                         <TableCell className="px-2 py-2 text-center">
                           <button
@@ -409,7 +409,7 @@ export default function InvoiceScan() {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600 dark:text-gray-400">Total:</span>
                   <span className="text-xl font-bold text-gray-900 dark:text-white">
-                    ${totals.total.toFixed(2)}
+                    TND {totals.total.toFixed(2)}
                   </span>
                 </div>
               </div>

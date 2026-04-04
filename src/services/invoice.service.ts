@@ -17,8 +17,13 @@ export interface InvoiceItem {
 export interface Invoice {
   id: string;
   clientId: string;
-  clientName?: string;
-  clientEmail?: string;
+  client?: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
   businessId: string;
   status: 'paid' | 'unpaid' | 'overdue';
   totalAmount: number;
@@ -27,6 +32,8 @@ export interface Invoice {
   notes?: string;
   dueDate?: string;
   invoiceNumber: string;
+  sourceQuoteId?: string;
+  sourceSalesOrderId?: string;
   createdAt: string;
   updatedAt: string;
   items: InvoiceItem[];
@@ -47,8 +54,6 @@ export interface CreateInvoiceItemDto {
 
 export interface CreateInvoiceDto {
   clientId: string;
-  clientName?: string;
-  clientEmail?: string;
   status?: 'paid' | 'unpaid' | 'overdue';
   notes?: string;
   dueDate?: string;
@@ -57,8 +62,6 @@ export interface CreateInvoiceDto {
 
 export interface UpdateInvoiceDto {
   clientId?: string;
-  clientName?: string;
-  clientEmail?: string;
   status?: 'paid' | 'unpaid' | 'overdue';
   notes?: string;
   dueDate?: string;

@@ -3,21 +3,32 @@ import { AxiosError } from 'axios';
 
 export interface CreditNote {
   id: string;
+  clientId?: string;
   clientName: string;
   amount: number;
-  reason: string;
+  reason: 'returned_goods' | 'pricing_error' | 'product_expired_or_damaged' | 'service_not_delivered' | 'partial_refund' | 'other';
+  reasonDetails?: string;
   reference?: string;
+  invoiceId?: string;
+  invoice?: {
+    id: string;
+    invoiceNumber: string;
+    client?: { name: string };
+  };
   date: string;
-  status: 'active' | 'used' | 'cancelled';
+  status: 'draft' | 'approved' | 'applied' | 'refunded' | 'cancelled';
   businessId: string;
   createdAt: string;
 }
 
 export interface CreateCreditNoteDto {
+  clientId?: string;
   clientName: string;
   amount: number;
-  reason: string;
+  reason: 'returned_goods' | 'pricing_error' | 'product_expired_or_damaged' | 'service_not_delivered' | 'partial_refund' | 'other';
+  reasonDetails?: string;
   reference?: string;
+  invoiceId?: string;
   date?: Date;
 }
 
@@ -66,6 +77,36 @@ export const creditNoteService = {
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       throw new Error(axiosError.response?.data?.message || 'Failed to update credit note');
+    }
+  },
+
+  async approve(id: string): Promise<CreditNote> {
+    try {
+      const response = await api.patch(`/credit-notes/${id}/approve`);
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to approve credit note');
+    }
+  },
+
+  async apply(id: string): Promise<CreditNote> {
+    try {
+      const response = await api.post(`/credit-notes/${id}/apply`);
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to apply credit note');
+    }
+  },
+
+  async refund(id: string): Promise<CreditNote> {
+    try {
+      const response = await api.post(`/credit-notes/${id}/refund`);
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Failed to refund credit note');
     }
   },
 

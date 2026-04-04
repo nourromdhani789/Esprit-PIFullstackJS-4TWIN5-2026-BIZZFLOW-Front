@@ -1,25 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import { purchaseOrderService, PurchaseOrder, CreatePurchaseOrderDto } from '../services/purchase-order.service';
+import { supplierService, Supplier } from '../services/supplier.service';
 import PageMeta from '../components/common/PageMeta';
 import PageBreadcrumb from '../components/common/PageBreadCrumb';
 import Button from '../components/ui/button/Button';
+import Label from '../components/form/Label';
+import Input from '../components/form/input/InputField';
+import { Modal } from '../components/ui/modal';
 
 export default function PurchaseOrders() {
+  const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _error = error;
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [formData, setFormData] = useState<CreatePurchaseOrderDto>({
-    supplierName: '',
+    supplierId: '',
     totalAmount: 0,
     notes: '',
   });
 
+  // Check for supplierId in URL and pre-select if present
+  useEffect(() => {
+    const supplierId = searchParams.get('supplierId');
+    if (supplierId) {
+      setFormData(prev => ({ ...prev, supplierId }));
+      setShowModal(true);
+    }
+  }, [searchParams]);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   useEffect(() => {
     fetchOrders();
+    fetchSuppliers();
   }, []);
 
   const fetchOrders = async () => {
@@ -35,12 +53,21 @@ export default function PurchaseOrders() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const fetchSuppliers = async () => {
+    try {
+      const data = await supplierService.getSuppliers();
+      setSuppliers(data);
+    } catch (err: any) {
+      console.error('Failed to load suppliers:', err);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
       await purchaseOrderService.create(formData);
       setShowModal(false);
-      setFormData({ supplierName: '', totalAmount: 0, notes: '' });
+      setFormData({ supplierId: '', totalAmount: 0, notes: '' });
       fetchOrders();
     } catch (err: any) {
       alert(err.message);
@@ -124,7 +151,7 @@ export default function PurchaseOrders() {
                 {orders.map((order) => (
                   <tr key={order.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{order.supplierName}</td>
-                    <td className="px-6 py-4">${order.totalAmount}</td>
+                    <td className="px-6 py-4">TND {order.totalAmount}</td>
                     <td className="px-6 py-4">{new Date(order.date).toLocaleDateString()}</td>
                     <td className="px-6 py-4">{getStatusBadge(order.status)}</td>
                     <td className="px-6 py-4 max-w-xs truncate">{order.notes || '-'}</td>
@@ -153,55 +180,59 @@ export default function PurchaseOrders() {
           </div>
         </div>
 
-        {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">New Purchase Order</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.supplierName}
-                    onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
+        <Modal isOpen={showModal} onClose={handleCloseModal} className="max-w-md">
+          <div className="p-6">
+            <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">New Purchase Order</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label>Supplier</Label>
+                <select
+                  required
+                  value={formData.supplierId}
+                  onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">Select a supplier</option>
+                  {suppliers.map((supplier) => (
+                    <option key={supplier.id} value={supplier.id}>
+                      {supplier.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Total Amount</label>
-                  <input
-                    type="number"
-                    required
-                    min={0}
-                    step={0.01}
-                    value={formData.totalAmount}
-                    onChange={(e) => setFormData({ ...formData, totalAmount: parseFloat(e.target.value) })}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
+              <div>
+                <Label>Total Amount</Label>
+                <Input
+                  type="number"
+                  required
+                  min={0}
+                  step={0.01}
+                  value={formData.totalAmount}
+                  onChange={(e) => setFormData({ ...formData, totalAmount: parseFloat(e.target.value) })}
+                  placeholder="0.00"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                  <textarea
-                    rows={3}
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
+              <div>
+                <Label>Notes</Label>
+                <textarea
+                  rows={3}
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
 
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setShowModal(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">Create Order</Button>
-                </div>
-              </form>
-            </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={handleCloseModal}>
+                  Cancel
+                </Button>
+                <Button type="submit">Create Order</Button>
+              </div>
+            </form>
           </div>
-        )}
+        </Modal>
       </div>
     </>
   );

@@ -142,6 +142,10 @@ export const authService = {
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('businessColors');
+    localStorage.removeItem('businessLogoUrl');
+    // Trigger any context listening for style reset on logout
+    window.dispatchEvent(new Event('business-reset-colors'));
   },
 
   getToken(): string | null {

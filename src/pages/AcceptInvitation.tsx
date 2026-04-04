@@ -240,6 +240,7 @@ export default function AcceptInvitation() {
               </div>
 
               <Button
+                type="submit"
                 className="w-full"
                 disabled={isLoading || !formData.firstName || !formData.lastName || !formData.password || formData.password.length < 6 || formData.password !== formData.confirmPassword}
               >
