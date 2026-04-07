@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { useBusiness } from "../contexts/BusinessContext";
 import { invoiceService, Invoice } from "../services/invoice.service";
@@ -25,15 +25,18 @@ export default function InvoiceList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { formatCurrency } = useBusiness();
 
-  // Filter states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "paid" | "unpaid" | "overdue">("all");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [minAmount, setMinAmount] = useState("");
-  const [maxAmount, setMaxAmount] = useState("");
+  // Filter states - initialize from URL params
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
+  const [statusFilter, setStatusFilter] = useState<"all" | "paid" | "unpaid" | "overdue">(
+    (searchParams.get('status') as any) || "all"
+  );
+  const [dateFrom, setDateFrom] = useState(searchParams.get('dateFrom') || "");
+  const [dateTo, setDateTo] = useState(searchParams.get('dateTo') || "");
+  const [minAmount, setMinAmount] = useState(searchParams.get('minAmount') || "");
+  const [maxAmount, setMaxAmount] = useState(searchParams.get('maxAmount') || "");
   const [clientFilter, setClientFilter] = useState("");
 
   // Calculate summary stats
@@ -96,9 +99,14 @@ export default function InvoiceList() {
     setMinAmount("");
     setMaxAmount("");
     setClientFilter("");
+    // Clear URL params
+    setSearchParams({});
   };
 
   const hasActiveFilters = searchQuery || statusFilter !== "all" || dateFrom || dateTo || minAmount || maxAmount || clientFilter;
+
+  // Show notification when filters are applied from Smart Search
+  const smartSearchApplied = searchParams.has('minAmount') || searchParams.has('status') || searchParams.has('search');
 
   const fetchInvoices = async () => {
     try {
@@ -180,6 +188,33 @@ export default function InvoiceList() {
             </Button>
           </div>
         </div>
+
+        {/* Smart Search Notification */}
+        {smartSearchApplied && (
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span className="text-blue-800 dark:text-blue-200 font-medium">
+                  Filters applied from Smart Search
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  clearFilters();
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+              >
+                Clear filters
+              </button>
+            </div>
+            <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+              Showing results matching your query
+            </p>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-400">

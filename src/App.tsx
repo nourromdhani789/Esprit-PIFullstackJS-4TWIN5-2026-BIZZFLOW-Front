@@ -1,6 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
+import { useState, useEffect } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { FocusModeProvider } from "./contexts/FocusModeContext";
 import ProtectedRoute, { AdminRoute, BusinessRoute, ManagerRoute, FinancialRoute } from "./components/ProtectedRoute";
+import { AIOnboarding } from "./components/ai/AIOnboarding";
+import { AIChatbotButton } from "./components/ai/AIChatbotButton";
+import AIChatbotWidget from "./components/ai/AIChatbotWidget";
+
+// Import AI animations CSS
+import "./styles/ai-animations.css";
 
 // Auth Pages
 import SignIn from "./pages/AuthPages/SignIn";
@@ -51,6 +59,7 @@ import QuoteDetail from "./pages/QuoteDetail";
 import SalesOrderList from "./pages/SalesOrderList";
 import CreateSalesOrder from "./pages/CreateSalesOrder";
 import SalesOrderDetail from "./pages/SalesOrderDetail";
+import AIScanner from "./pages/AIScanner";
 
 // ============================================
 // INVENTORY (All business roles)
@@ -78,6 +87,7 @@ import CreateExpense from "./pages/CreateExpense";
 import Payments from "./pages/Payments";
 import CreditNotes from "./pages/CreditNotes";
 import AuditLogs from "./pages/AuditLogs";
+import ReportGenerator from "./pages/ReportGenerator";
 
 // ============================================
 // OTHER
@@ -116,20 +126,32 @@ const HomeRedirect = () => {
 };
 
 export default function App() {
+  const [chatbotOpen, setChatbotOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Show AI onboarding on first visit
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem("bizflow_ai_onboarding_seen");
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
   return (
     <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* Home redirect - redirects to appropriate dashboard */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <HomeRedirect />
-              </ProtectedRoute>
-            }
-          />
+      <FocusModeProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            {/* Home redirect - redirects to appropriate dashboard */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <HomeRedirect />
+                </ProtectedRoute>
+              }
+            />
 
           {/* ============================================
               PLATFORM ADMIN ROUTES (PLATFORM_ADMIN ONLY)
@@ -220,6 +242,14 @@ export default function App() {
             />
 
             {/* Documents - Owner, Admin, Accountant */}
+            <Route
+              path="/ai-scanner"
+              element={
+                <FinancialRoute>
+                  <AIScanner />
+                </FinancialRoute>
+              }
+            />
             <Route
               path="/invoices"
               element={
@@ -419,6 +449,16 @@ export default function App() {
               }
             />
 
+            {/* Report Generator - Financial roles */}
+            <Route
+              path="/report-generator"
+              element={
+                <FinancialRoute>
+                  <ReportGenerator />
+                </FinancialRoute>
+              }
+            />
+
             {/* Other Pages - All business roles */}
             <Route
               path="/activity"
@@ -475,7 +515,25 @@ export default function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        
+        {/* AI Onboarding Modal */}
+        <AIOnboarding 
+          isOpen={showOnboarding} 
+          onClose={() => setShowOnboarding(false)} 
+        />
+        
+        {/* AI Chatbot - conditionally shown */}
+        {chatbotOpen && (
+          <AIChatbotWidget isOpen={true} onClose={() => setChatbotOpen(false)} />
+        )}
+        
+        {/* AI Chatbot Floating Button */}
+        <AIChatbotButton
+          isOpen={chatbotOpen}
+          onClick={() => setChatbotOpen(!chatbotOpen)}
+        />
       </Router>
+      </FocusModeProvider>
     </AuthProvider>
   );
 }

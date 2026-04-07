@@ -814,3 +814,99 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
 }
+
+/* CKEditor Custom Styles */
+.ckeditor-container .ck.ck-editor {
+  @apply border-0;
+}
+
+.ckeditor-container .ck.ck-editor__main > .ck.ck-editor__editable {
+  @apply min-h-[500px] border-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.ckeditor-container .ck.ck-editor__main > .ck.ck-editor__editable.ck-focused {
+  @apply border-0 shadow-none;
+}
+
+.ckeditor-container .ck.ck-toolbar {
+  @apply bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-t-lg;
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.dark .ckeditor-container .ck.ck-toolbar {
+  border-bottom: 1px solid var(--color-gray-700);
+}
+
+.ckeditor-container .ck.ck-toolbar .ck.ck-toolbar__items {
+  @apply flex-wrap;
+}
+
+.ckeditor-container .ck.ck-button {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.ckeditor-container .ck.ck-button.ck-on {
+  @apply bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300;
+}
+
+.ckeditor-container .ck.ck-button:hover {
+  @apply bg-gray-100 dark:bg-gray-700;
+}
+
+.ckeditor-container .ck.ck-dropdown__panel {
+  @apply bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700;
+}
+
+.ckeditor-container .ck.ck-list__item .ck.ck-button {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.ckeditor-container .ck.ck-list__item .ck.ck-button:hover {
+  @apply bg-gray-100 dark:bg-gray-700;
+}
+
+.ckeditor-container .ck.ck-list__item .ck.ck-button.ck-on {
+  @apply bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300;
+}
+
+.ckeditor-container .ck.ck-input-text {
+  @apply bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white;
+}
+
+.ckeditor-container .ck.ck-labeled-field-view__status {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+/* Ensure CKEditor content area is properly styled in dark mode */
+.dark .ck.ck-content {
+  @apply bg-gray-800 text-white;
+}
+
+.dark .ck.ck-content p,
+.dark .ck.ck-content li,
+.dark .ck.ck-content h1,
+.dark .ck.ck-content h2,
+.dark .ck.ck-content h3,
+.dark .ck.ck-content h4,
+.dark .ck.ck-content h5,
+.dark .ck.ck-content h6 {
+  @apply text-white;
+}
+
+.dark .ck.ck-content blockquote {
+  @apply border-l-gray-600 text-gray-300;
+}
+
+.dark .ck.ck-content table {
+  @apply border-gray-600;
+}
+
+.dark .ck.ck-content th,
+.dark .ck.ck-content td {
+  @apply border-gray-600 text-white;
+}
+
+.dark .ck.ck-content th {
+  @apply bg-gray-700;
+}

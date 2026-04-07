@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";
 import AppSidebar from "./AppSidebar";
+import { FocusModeIndicator } from "../components/ui/focus-mode/FocusModeIndicator";
 
 const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -10,6 +11,7 @@ const LayoutContent: React.FC = () => {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
+      <FocusModeIndicator />
       <div className="min-h-screen xl:flex">
         <div>
           <AppSidebar />

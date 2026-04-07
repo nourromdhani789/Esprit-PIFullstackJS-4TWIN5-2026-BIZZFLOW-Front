@@ -32,6 +32,7 @@ export interface NavSubItem {
   roles: Role[];
   new?: boolean;
   pro?: boolean;
+  ai?: boolean;
 }
 
 // ============================================
@@ -106,6 +107,14 @@ export const businessMenuItems: NavItem[] = [
     icon: 'DocumentIcon',
     roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
     subItems: [
+      {
+        name: 'AI Scanner',
+        path: '/ai-scanner',
+        roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
+        new: true,
+        pro: true,
+        ai: true,
+      },
       {
         name: 'Quotes',
         path: '/quotes',
@@ -209,6 +218,13 @@ export const businessMenuItems: NavItem[] = [
     name: 'Expenses',
     path: '/expenses',
     icon: 'ExpenseIcon',
+    roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT],
+  },
+  // Report Generator - Quick reports with CKEditor
+  {
+    name: 'Report Generator',
+    path: '/report-generator',
+    icon: 'ReportIcon',
     roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT],
   },
 ];

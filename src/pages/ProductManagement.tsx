@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { productService, Product, CreateProductDto } from "../services/product.service";
 import Button from "../components/ui/button/Button";
@@ -25,6 +26,7 @@ interface ProductFormData {
 }
 
 export default function ProductManagement() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,13 +45,18 @@ export default function ProductManagement() {
     productType: "storable",
   });
 
-  // Filter states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState<"all" | "storable" | "consumable" | "service">("all");
+  // Filter states - initialize from URL params
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
+  const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || "");
+  const [typeFilter, setTypeFilter] = useState<"all" | "storable" | "consumable" | "service">(
+    (searchParams.get('type') as any) || "all"
+  );
   const [usedForFilter, setUsedForFilter] = useState<"all" | "sales" | "purchases" | "both">("all");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || "");
+
+  // Show notification when filters are applied from Smart Search
+  const smartSearchApplied = searchParams.has('search') || searchParams.has('category') || searchParams.has('minPrice');
 
   const fetchProducts = async () => {
     try {
@@ -111,6 +118,7 @@ export default function ProductManagement() {
     setUsedForFilter("all");
     setMinPrice("");
     setMaxPrice("");
+    setSearchParams({});
   };
 
   const hasActiveFilters = searchQuery || categoryFilter || typeFilter !== "all" || usedForFilter !== "all" || minPrice || maxPrice;
@@ -237,6 +245,27 @@ export default function ProductManagement() {
             + Add Product
           </Button>
         </div>
+
+        {smartSearchApplied && (
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span className="text-blue-800 dark:text-blue-200 font-medium">
+                  Filters applied from Smart Search
+                </span>
+              </div>
+              <button
+                onClick={clearFilters}
+                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+              >
+                Clear filters
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-400">
