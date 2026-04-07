@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { salesOrderService, SalesOrder } from "../services/sales-order.service";
+import { aiService } from "../services/ai.service";
+import { formatTextForTTS } from "../services/tts.service";
+import { AudioPlayer } from "../components/ui/audio-player/AudioPlayer";
 import { useBusiness } from "../contexts/BusinessContext";
 import Button from "../components/ui/button/Button";
 import Badge from "../components/ui/badge/Badge";
@@ -31,6 +34,13 @@ export default function SalesOrderDetail() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: "", message: "" });
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showTranslationModal, setShowTranslationModal] = useState(false);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [translatedText, setTranslatedText] = useState("");
+  const [summaryText, setSummaryText] = useState("");
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState("fr");
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
@@ -139,6 +149,38 @@ export default function SalesOrderDetail() {
       navigate(`/invoices/${invoice.id}`);
     } catch (err: any) {
       showToast('error', err.message || "Failed to convert to invoice");
+    }
+  };
+
+  // AI Document Translation
+  const handleTranslate = async () => {
+    if (!salesOrder) return;
+    setIsTranslating(true);
+    try {
+      const textToTranslate = `Sales Order #${salesOrder.salesOrderNumber}\n\nClient: ${salesOrder.client?.name || "Client"}\n${salesOrder.client?.email || ""}\n\nItems:\n${salesOrder.items?.map((item) => `${item.description || item.product?.name}: ${item.quantity} x ${formatCurrency(Number(item.unitPrice))}`).join("\n")}\n\nTotal: ${formatCurrency(Number(salesOrder.totalAmount))}\n\nNotes: ${salesOrder.notes || ""}`;
+      
+      const translated = await aiService.translateDocument(textToTranslate, targetLanguage);
+      setTranslatedText(translated);
+    } catch (err) {
+      showToast('error', 'Translation failed');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  // AI Document Summarization
+  const handleSummarize = async () => {
+    if (!salesOrder) return;
+    setIsSummarizing(true);
+    try {
+      const textToSummarize = `Sales Order #${salesOrder.salesOrderNumber} for ${salesOrder.client?.name || "Client"}. Status: ${salesOrder.status}. Total amount: ${formatCurrency(Number(salesOrder.totalAmount))}. Items: ${salesOrder.items?.map((item) => `${item.description || item.product?.name} (${item.quantity})`).join(", ")}. ${salesOrder.notes ? `Notes: ${salesOrder.notes}` : ""}`;
+      
+      const summary = await aiService.summarizeDocument(textToSummarize);
+      setSummaryText(summary);
+    } catch (err) {
+      showToast('error', 'Summarization failed');
+    } finally {
+      setIsSummarizing(false);
     }
   };
 
@@ -354,6 +396,61 @@ export default function SalesOrderDetail() {
           </div>
         )}
 
+        {/* AI Features Section */}
+        <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-6 mb-6">
+          <h2 className="text-lg font-semibold text-purple-900 dark:text-purple-300 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            AI Features
+          </h2>
+          <div className="flex flex-wrap gap-3 items-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowTranslationModal(true)}
+              size="sm"
+              className="text-purple-600 border-purple-600 hover:bg-purple-50"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+              </svg>
+              Translate Document
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSummaryModal(true);
+                handleSummarize();
+              }}
+              size="sm"
+              className="text-purple-600 border-purple-600 hover:bg-purple-50"
+              disabled={isSummarizing}
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              {isSummarizing ? "Generating..." : "Generate Summary"}
+            </Button>
+            {salesOrder && (
+              <AudioPlayer
+                text={formatTextForTTS({
+                  invoiceNumber: salesOrder.salesOrderNumber,
+                  clientName: salesOrder.client?.name,
+                  total: salesOrder.totalAmount,
+                  status: salesOrder.status,
+                  items: salesOrder.items?.map(item => ({
+                    name: item.description || item.product?.name || 'Item',
+                    quantity: item.quantity,
+                    price: Number(item.unitPrice || 0),
+                  })),
+                  dueDate: salesOrder.expectedDeliveryDate,
+                })}
+                label="🔊 Listen"
+              />
+            )}
+          </div>
+        </div>
+
         {/* Source Document */}
         {salesOrder.sourceQuoteId && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-6">
@@ -387,6 +484,80 @@ export default function SalesOrderDetail() {
             <p className="text-green-700 dark:text-green-400">
               Converted to Invoice: <button className="underline font-medium" onClick={() => navigate(`/invoices/${salesOrder.convertedToInvoiceId}`)}>View →</button>
             </p>
+          </div>
+        )}
+
+        {/* AI Translation Modal */}
+        {showTranslationModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4 max-h-[80vh] overflow-y-auto">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                AI Document Translation
+              </h2>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Target Language
+                </label>
+                <select
+                  value={targetLanguage}
+                  onChange={(e) => setTargetLanguage(e.target.value)}
+                  className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="fr">French</option>
+                  <option value="es">Spanish</option>
+                  <option value="de">German</option>
+                  <option value="it">Italian</option>
+                  <option value="ar">Arabic</option>
+                  <option value="zh">Chinese</option>
+                </select>
+              </div>
+              <Button
+                onClick={handleTranslate}
+                disabled={isTranslating}
+                className="w-full mb-4"
+              >
+                {isTranslating ? "Translating..." : "Translate"}
+              </Button>
+              {translatedText && (
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 dark:text-white mb-2">Translation Result:</h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{translatedText}</p>
+                </div>
+              )}
+              <div className="flex justify-end mt-4">
+                <Button variant="outline" onClick={() => setShowTranslationModal(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI Summary Modal */}
+        {showSummaryModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                AI Document Summary
+              </h2>
+              {isSummarizing ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                  <span className="ml-3 text-gray-600 dark:text-gray-400">Generating summary...</span>
+                </div>
+              ) : summaryText ? (
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{summaryText}</p>
+                </div>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">No summary available.</p>
+              )}
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={() => setShowSummaryModal(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
           </div>
         )}
 

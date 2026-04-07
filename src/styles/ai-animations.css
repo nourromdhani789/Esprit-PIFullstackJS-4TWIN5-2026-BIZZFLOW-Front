@@ -1,0 +1,305 @@
+/* AI Feature Animations and Effects CSS */
+
+/* ============================================
+   ANIMATION KEYFRAMES
+   ============================================ */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) translateX(-50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(147, 51, 234, 0.6);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes loading-bar {
+  0% {
+    width: 0%;
+    left: 0;
+  }
+  50% {
+    width: 100%;
+    left: 0;
+  }
+  100% {
+    width: 0%;
+    left: 100%;
+  }
+}
+
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   ANIMATION UTILITY CLASSES
+   ============================================ */
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.5s ease-out forwards;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-loading-bar {
+  animation: loading-bar 1.5s ease-in-out infinite;
+  position: relative;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ============================================
+   AI GLOW EFFECTS
+   ============================================ */
+
+.ai-glow {
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.3),
+              0 0 40px rgba(147, 51, 234, 0.2);
+}
+
+.ai-glow-strong {
+  box-shadow: 0 0 30px rgba(147, 51, 234, 0.5),
+              0 0 60px rgba(147, 51, 234, 0.3);
+}
+
+.ai-glow-subtle {
+  box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
+}
+
+/* Button glow on hover */
+.ai-button-glow {
+  transition: all 0.3s ease;
+}
+
+.ai-button-glow:hover {
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.4),
+              0 0 40px rgba(147, 51, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   AI GRADIENT BACKGROUNDS
+   ============================================ */
+
+.ai-gradient {
+  background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
+}
+
+.ai-gradient-subtle {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+}
+
+.ai-gradient-text {
+  background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   AI BORDER EFFECTS
+   ============================================ */
+
+.ai-border {
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #9333ea, #3b82f6) border-box;
+}
+
+.ai-border-glow {
+  border: 2px solid rgba(147, 51, 234, 0.3);
+  box-shadow: 0 0 15px rgba(147, 51, 234, 0.2);
+}
+
+/* ============================================
+   AI CARD STYLES
+   ============================================ */
+
+.ai-card {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.ai-card:hover {
+  border-color: rgba(147, 51, 234, 0.4);
+  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.1);
+}
+
+/* ============================================
+   FOCUS MODE STYLES
+   ============================================ */
+
+.focus-mode-active {
+  /* Applied to body when focus mode is on */
+}
+
+.focus-highlight {
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.3),
+              0 0 20px rgba(147, 51, 234, 0.2);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.ai-loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ============================================
+   HOVER EFFECTS
+   ============================================ */
+
+.ai-hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ai-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(147, 51, 234, 0.15);
+}
+
+.ai-hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.ai-hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* ============================================
+   AI CHATBOT SPECIFIC
+   ============================================ */
+
+.ai-chatbot-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+}
+
+.ai-chatbot-button::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(135deg, #9333ea, #3b82f6);
+  border-radius: 50%;
+  opacity: 0.5;
+  filter: blur(10px);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ============================================
+   DARK MODE ADJUSTMENTS
+   ============================================ */
+
+.dark .ai-card {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+}
+
+.dark .ai-loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    #374151 25%,
+    #4b5563 50%,
+    #374151 75%
+  );
+  background-size: 200% 100%;
+}

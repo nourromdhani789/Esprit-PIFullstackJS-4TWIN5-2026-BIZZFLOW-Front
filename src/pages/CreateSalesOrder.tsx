@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams, useLocation } from "react-router";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { salesOrderService, CreateSalesOrderDto, CreateSalesOrderItemDto } from "../services/sales-order.service";
 import { clientService, Client } from "../services/client.service";
@@ -31,8 +31,12 @@ interface SalesOrderFormData {
 export default function CreateSalesOrder() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const preselectedClientId = searchParams.get("clientId");
   const sourceQuoteId = searchParams.get("sourceQuoteId");
+  
+  // Get scan data from AI Scanner if available
+  const scanData = (location.state as any)?.scanData;
   
   const { business, formatCurrency } = useBusiness();
   const [products, setProducts] = useState<Product[]>([]);
@@ -68,6 +72,10 @@ export default function CreateSalesOrder() {
   useEffect(() => {
     fetchProducts();
     fetchClients();
+    // If scan data available, pre-fill form
+    if (scanData) {
+      handleScanData(scanData);
+    }
   }, []);
 
   const fetchProducts = async () => {
@@ -88,6 +96,68 @@ export default function CreateSalesOrder() {
       setClients(data);
     } catch (err: any) {
       setError(err.message || "Failed to load clients");
+    }
+  };
+
+  // Handle scan data from AI Scanner
+  const handleScanData = (scanData: any) => {
+    if (!scanData || scanData.documentType !== 'sales_order') return;
+    
+    // Pre-fill notes if available
+    if (scanData.notes) {
+      setFormData(prev => ({ ...prev, notes: scanData.notes }));
+    }
+    
+    // Pre-fill dates if available
+    if (scanData.issueDate) {
+      setFormData(prev => ({ ...prev, issueDate: scanData.issueDate }));
+    }
+    if (scanData.expectedDeliveryDate) {
+      setFormData(prev => ({ ...prev, expectedDeliveryDate: scanData.expectedDeliveryDate }));
+    }
+    
+    // Handle client from scan data
+    if (scanData.clientName) {
+      // Try to find matching client by name from scan (only if clients loaded)
+      const matchedClient = clients.length > 0 ? clients.find(c => 
+        c.name.toLowerCase().includes(scanData.clientName.toLowerCase()) ||
+        scanData.clientName.toLowerCase().includes(c.name.toLowerCase())
+      ) : null;
+      
+      if (matchedClient) {
+        setFormData(prev => ({ ...prev, clientId: matchedClient.id }));
+      } else {
+        // No match found - open Add New Client modal with pre-filled data
+        setNewClient({
+          name: scanData.clientName || "",
+          email: scanData.clientEmail || "",
+          phone: scanData.clientPhone || "",
+          address: scanData.clientAddress || "",
+        });
+        setShowAddClient(true);
+      }
+    }
+    
+    // Add items if available
+    if (scanData.items && scanData.items.length > 0 && products.length > 0) {
+      const scanItems = scanData.items.map((item: any, idx: number) => {
+        // Try to match product by name
+        const matchedProduct = products.find(p => 
+          p.name.toLowerCase().includes(item.description?.toLowerCase() || '') ||
+          (item.description && item.description.toLowerCase().includes(p.name.toLowerCase()))
+        );
+        
+        return {
+          tempId: `scan-${idx}-${Math.random().toString(36).substr(2, 9)}`,
+          productId: matchedProduct?.id || '',
+          productName: matchedProduct?.name || item.description || 'Unknown Product',
+          quantity: item.quantity || 1,
+          unitPrice: item.unitPrice || item.price || 0,
+          description: item.description || '',
+        };
+      });
+      
+      setItems(scanItems);
     }
   };
 

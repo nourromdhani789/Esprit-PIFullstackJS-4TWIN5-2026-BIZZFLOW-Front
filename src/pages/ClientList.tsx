@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import PageMeta from "../components/common/PageMeta";
 import { clientService, Client } from "../services/client.service";
+import { aiService } from "../services/ai.service";
 import Button from "../components/ui/button/Button";
 import Input from "../components/form/input/InputField";
 import {
@@ -26,9 +27,10 @@ function formatTND(amount: number): string {
 
 export default function ClientList() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [clients, setClients] = useState<ClientWithStats[]>([]);
   const [filteredClients, setFilteredClients] = useState<ClientWithStats[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -39,9 +41,19 @@ export default function ClientList() {
     phone: "",
     address: "",
   });
+  const [emailValidation, setEmailValidation] = useState<{ isValid: boolean; message: string } | null>(null);
+  const [isValidatingEmail, setIsValidatingEmail] = useState(false);
+  const [showAutoFillModal, setShowAutoFillModal] = useState(false);
+  const [autoFillText, setAutoFillText] = useState("");
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
 
-  // Additional filter states
-  const [hasActivityFilter, setHasActivityFilter] = useState<"all" | "with_invoices" | "without_invoices">("all");
+  // Additional filter states - initialize from URL
+  const [hasActivityFilter, setHasActivityFilter] = useState<"all" | "with_invoices" | "without_invoices">(
+    (searchParams.get('activity') as any) || "all"
+  );
+
+  // Show notification when filters are applied from Smart Search
+  const smartSearchApplied = searchParams.has('search') || searchParams.has('activity');
 
   useEffect(() => {
     fetchClients();
@@ -76,6 +88,7 @@ export default function ClientList() {
   const clearFilters = () => {
     setSearchQuery("");
     setHasActivityFilter("all");
+    setSearchParams({});
   };
 
   const hasActiveFilters = searchQuery || hasActivityFilter !== "all";
@@ -156,6 +169,56 @@ export default function ClientList() {
     setFormData({ name: "", email: "", phone: "", address: "" });
     setEditingClient(null);
     setError("");
+    setEmailValidation(null);
+  };
+
+  // AI Email Validation
+  const validateEmail = async (email: string) => {
+    if (!email) {
+      setEmailValidation(null);
+      return;
+    }
+    setIsValidatingEmail(true);
+    try {
+      const result = await aiService.validateEmail(email);
+      if (!result.isValid) {
+        setEmailValidation({ isValid: false, message: "Invalid email format" });
+      } else if (!result.isDeliverable) {
+        setEmailValidation({ isValid: false, message: "Email may not be deliverable" });
+      } else if (result.suggestions && result.suggestions.length > 0) {
+        setEmailValidation({ isValid: true, message: `Did you mean: ${result.suggestions[0]}?` });
+      } else {
+        setEmailValidation({ isValid: true, message: "Email looks valid" });
+      }
+    } catch {
+      setEmailValidation(null);
+    } finally {
+      setIsValidatingEmail(false);
+    }
+  };
+
+  // AI Smart Auto-Fill
+  const handleAutoFill = async () => {
+    if (!autoFillText.trim()) return;
+    setIsAutoFilling(true);
+    try {
+      const extracted = await aiService.extractClientInfo(autoFillText);
+      setFormData((prev) => ({
+        name: extracted.name || prev.name,
+        email: extracted.email || prev.email,
+        phone: extracted.phone || prev.phone,
+        address: extracted.address || prev.address,
+      }));
+      setShowAutoFillModal(false);
+      setAutoFillText("");
+      if (extracted.email) {
+        await validateEmail(extracted.email);
+      }
+    } catch (err) {
+      console.error("Auto-fill failed:", err);
+    } finally {
+      setIsAutoFilling(false);
+    }
   };
 
   // Calculate summary stats
@@ -187,6 +250,27 @@ export default function ClientList() {
               + New Client
             </Button>
           </div>
+
+          {smartSearchApplied && (
+            <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <span className="text-blue-800 dark:text-blue-200 font-medium">
+                    Filters applied from Smart Search
+                  </span>
+                </div>
+                <button
+                  onClick={clearFilters}
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                >
+                  Clear filters
+                </button>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-400">
@@ -304,9 +388,24 @@ export default function ClientList() {
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-lg">
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {editingClient ? "Edit Client" : "Add New Client"}
-                  </h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      {editingClient ? "Edit Client" : "Add New Client"}
+                    </h2>
+                    {!editingClient && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowAutoFillModal(true)}
+                        size="sm"
+                        className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                      >
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        AI Auto-Fill
+                      </Button>
+                    )}
+                  </div>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -328,10 +427,22 @@ export default function ClientList() {
                       <input
                         type="email"
                         value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        onChange={(e) => {
+                          const email = e.target.value;
+                          setFormData({ ...formData, email });
+                          setTimeout(() => validateEmail(email), 500);
+                        }}
                         className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                         placeholder="client@example.com"
                       />
+                      {isValidatingEmail && (
+                        <p className="mt-1 text-xs text-gray-500">Validating...</p>
+                      )}
+                      {emailValidation && !isValidatingEmail && (
+                        <p className={`mt-1 text-xs ${emailValidation.isValid ? 'text-green-600' : 'text-red-600'}`}>
+                          {emailValidation.message}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -361,7 +472,10 @@ export default function ClientList() {
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => setShowAddModal(false)}
+                        onClick={() => {
+                          setShowAddModal(false);
+                          setEmailValidation(null);
+                        }}
                         className="flex-1"
                       >
                         Cancel
@@ -375,6 +489,39 @@ export default function ClientList() {
                       </Button>
                     </div>
                   </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* AI Auto-Fill Modal */}
+          {showAutoFillModal && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  AI Smart Auto-Fill
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Paste client information (from email, PDF, or any text) and AI will extract the details.
+                </p>
+                <textarea
+                  value={autoFillText}
+                  onChange={(e) => setAutoFillText(e.target.value)}
+                  placeholder="Paste client information here..."
+                  className="w-full h-32 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white resize-none mb-4"
+                />
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setShowAutoFillModal(false)} size="sm">
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleAutoFill}
+                    disabled={!autoFillText.trim() || isAutoFilling}
+                    size="sm"
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    {isAutoFilling ? "Extracting..." : "Extract Info"}
+                  </Button>
                 </div>
               </div>
             </div>

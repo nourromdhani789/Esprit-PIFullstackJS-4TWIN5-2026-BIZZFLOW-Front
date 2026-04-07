@@ -7,6 +7,7 @@ import { activityService, Activity } from "../../services/activity.service";
 import { paymentService } from "../../services/payment.service";
 import Button from "../../components/ui/button/Button";
 import { useBusiness } from "../../contexts/BusinessContext";
+import { AIReportGenerator } from "../../components/ui/report-generator/AIReportGenerator";
 import {
   LineChart,
   Line,
@@ -20,7 +21,7 @@ import {
   Legend,
 } from "recharts";
 
-// KPI Card Component
+// Smart KPI Card Component with Sparkline
 function KPICard({
   title,
   amount,
@@ -28,6 +29,7 @@ function KPICard({
   trend,
   trendUp,
   color,
+  sparklineData,
 }: {
   title: string;
   amount: string;
@@ -35,30 +37,93 @@ function KPICard({
   trend?: string;
   trendUp?: boolean;
   color: "blue" | "green" | "red" | "purple";
+  sparklineData?: number[];
 }) {
   const colorClasses = {
-    blue: "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400",
-    green: "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400",
-    red: "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400",
-    purple: "bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400",
+    blue: {
+      bg: "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
+      text: "text-blue-600 dark:text-blue-400",
+      icon: "bg-blue-500 text-white shadow-blue-500/30 dark:shadow-blue-400/20",
+      border: "border-blue-200 dark:border-blue-800",
+      spark: "#3b82f6",
+    },
+    green: {
+      bg: "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
+      text: "text-green-600 dark:text-green-400",
+      icon: "bg-green-500 text-white shadow-green-500/30 dark:shadow-green-400/20",
+      border: "border-green-200 dark:border-green-800",
+      spark: "#22c55e",
+    },
+    red: {
+      bg: "bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20",
+      text: "text-red-600 dark:text-red-400",
+      icon: "bg-red-500 text-white shadow-red-500/30 dark:shadow-red-400/20",
+      border: "border-red-200 dark:border-red-800",
+      spark: "#ef4444",
+    },
+    purple: {
+      bg: "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20",
+      text: "text-purple-600 dark:text-purple-400",
+      icon: "bg-purple-500 text-white shadow-purple-500/30 dark:shadow-purple-400/20",
+      border: "border-purple-200 dark:border-purple-800",
+      spark: "#a855f7",
+    },
+  };
+
+  const colors = colorClasses[color];
+
+  // Generate sparkline path
+  const generateSparkline = (data: number[]) => {
+    if (data.length < 2) return "";
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min || 1;
+    const width = 60;
+    const height = 20;
+    const points = data.map((val, i) => {
+      const x = (i / (data.length - 1)) * width;
+      const y = height - ((val - min) / range) * height;
+      return `${x},${y}`;
+    });
+    return `M ${points.join(" L ")}`;
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className={`rounded-2xl border ${colors.border} ${colors.bg} p-5 shadow-sm hover:shadow-md transition-all duration-300`}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
           <h3 className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{amount}</h3>
           {trend && (
-            <p className={`mt-1 text-sm ${trendUp ? "text-green-500" : "text-red-500"}`}>
-              {trendUp ? "↑" : "↓"} {trend}
+            <p className={`mt-1 text-sm flex items-center gap-1 ${trendUp ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+              <span className={`inline-flex items-center justify-center w-4 h-4 rounded-full ${trendUp ? "bg-green-100 dark:bg-green-900/40" : "bg-red-100 dark:bg-red-900/40"}`}>
+                {trendUp ? "↑" : "↓"}
+              </span>
+              {trend}
             </p>
           )}
         </div>
-        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${colorClasses[color]}`}>
+        <div className={`flex h-12 w-12 items-center justify-center rounded-xl shadow-lg ${colors.icon}`}>
           {icon}
         </div>
       </div>
+      
+      {/* Sparkline */}
+      {sparklineData && sparklineData.length > 1 && (
+        <div className="mt-4">
+          <svg width="100%" height="30" viewBox="0 0 60 20" preserveAspectRatio="none">
+            <path
+              d={generateSparkline(sparklineData)}
+              fill="none"
+              stroke={colors.spark}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="opacity-60"
+            />
+          </svg>
+        </div>
+      )}
     </div>
   );
 }
@@ -72,7 +137,7 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-6 dark:border-gray-700 dark:from-gray-800/50 dark:to-gray-900/50 shadow-sm">
       <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
       {children}
     </div>
@@ -492,6 +557,11 @@ export default function Home() {
   };
 
   const chartData = dashboardData?.monthlyTrend || [];
+  
+  // Generate sparkline data from monthly trend
+  const revenueSparkline = chartData.map(d => d.revenue || 0);
+  const expenseSparkline = chartData.map(d => d.expenses || 0);
+  const profitSparkline = chartData.map(d => d.profit || 0);
 
   return (
     <>
@@ -542,6 +612,25 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* AI Report Generator */}
+            <div className="mb-6">
+              <AIReportGenerator
+                data={{
+                  period: 'This Month',
+                  totalSales: dashboardData?.kpis.totalRevenue || 0,
+                  totalExpenses: dashboardData?.kpis.totalExpenses || 0,
+                  invoiceCount: dashboardData?.kpis.totalInvoices || 0,
+                  topClients: dashboardData?.topClients?.slice(0, 3).map(c => ({
+                    name: c.clientName,
+                    total: c.totalInvoiced,
+                  })) || [],
+                  comparisonData: {
+                    growthRate: dashboardData?.kpis.profitMargin || 0,
+                  },
+                }}
+              />
+            </div>
+
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <KPICard
@@ -553,6 +642,9 @@ export default function Home() {
                   </svg>
                 }
                 color="green"
+                trend="vs last month"
+                trendUp={true}
+                sparklineData={revenueSparkline}
               />
               <KPICard
                 title="Total Expenses"
@@ -563,6 +655,9 @@ export default function Home() {
                   </svg>
                 }
                 color="red"
+                trend="vs last month"
+                trendUp={false}
+                sparklineData={expenseSparkline}
               />
               <KPICard
                 title="Net Profit"
@@ -575,6 +670,7 @@ export default function Home() {
                 color="blue"
                 trend={`${dashboardData?.kpis.profitMargin || 0}% margin`}
                 trendUp={(dashboardData?.kpis.profit || 0) >= 0}
+                sparklineData={profitSparkline}
               />
               <KPICard
                 title="Profit Margin"
@@ -586,6 +682,8 @@ export default function Home() {
                   </svg>
                 }
                 color="purple"
+                trend="Healthy range"
+                trendUp={(dashboardData?.kpis.profitMargin || 0) > 20}
               />
             </div>
 

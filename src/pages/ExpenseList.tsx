@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import axios from "axios";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { expenseService, Expense } from "../services/expense.service";
@@ -63,13 +63,14 @@ const expenseCategories = [
 
 export default function ExpenseList() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Filter hook
+  // Filter hook - initialize from URL params
   const {
     filters,
     setFilter,
@@ -83,8 +84,19 @@ export default function ExpenseList() {
     getSavedFilterNames,
   } = useFilters<ExpenseFilters>({
     key: "expenses",
-    defaultValues: defaultFilters,
+    defaultValues: {
+      ...defaultFilters,
+      status: searchParams.get('status') || 'all',
+      category: searchParams.get('category') || '',
+      dateFrom: searchParams.get('dateFrom') || '',
+      dateTo: searchParams.get('dateTo') || '',
+      minAmount: searchParams.get('minAmount') || '',
+      maxAmount: searchParams.get('maxAmount') || '',
+    },
   });
+
+  // Show notification when filters are applied from Smart Search
+  const smartSearchApplied = searchParams.has('status') || searchParams.has('category') || searchParams.has('minAmount');
 
   // Debounced search
   const debouncedSearch = useDebouncedValue(filters.search, 300);
@@ -283,6 +295,31 @@ export default function ExpenseList() {
           <p className="text-2xl font-bold text-purple-600">TND {summaryStats.totalAmount.toFixed(2)}</p>
         </div>
       </div>
+
+        {/* Smart Search Notification */}
+        {smartSearchApplied && (
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span className="text-blue-800 dark:text-blue-200 font-medium">
+                  Filters applied from Smart Search
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  clearAllFilters();
+                  setSearchParams({});
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+              >
+                Clear filters
+              </button>
+            </div>
+          </div>
+        )}
 
       {error && (
         <div className="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-400">
