@@ -15,4 +15,17 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router'],
+          'vendor-ckeditor': ['ckeditor5', '@ckeditor/ckeditor5-react'],
+          'vendor-charts': ['recharts', 'apexcharts', 'react-apexcharts'],
+          'vendor-calendar': ['@fullcalendar/core', '@fullcalendar/react', '@fullcalendar/daygrid', '@fullcalendar/timegrid', '@fullcalendar/interaction', '@fullcalendar/list'],
+          'vendor-pdf': ['jspdf', 'html2canvas'],
+        },
+      },
+    },
+  },
 });
