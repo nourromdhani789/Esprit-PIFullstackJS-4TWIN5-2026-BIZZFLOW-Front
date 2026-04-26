@@ -1,5 +1,4 @@
 import api from './api';
-import { AxiosError } from 'axios';
 
 export interface Business {
   id: string;
@@ -54,7 +53,7 @@ export const businessService = {
       if (error.response?.status === 404) {
         return null;
       }
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get business');
     }
   },
@@ -64,7 +63,7 @@ export const businessService = {
       const response = await api.post('/businesses', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to create business');
     }
   },
@@ -74,7 +73,7 @@ export const businessService = {
       const response = await api.patch(`/businesses/${id}`, data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to update business');
     }
   },
@@ -91,7 +90,7 @@ export const businessService = {
       });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to upload logo');
     }
   },

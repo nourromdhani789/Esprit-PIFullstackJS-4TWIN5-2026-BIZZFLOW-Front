@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../../context/AuthContext';
 import { adminDashboardService, PlatformUser } from '../../services/admin-dashboard.service';
 
 const AdminUsers: React.FC = () => {
-  const navigate = useNavigate();
-  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<PlatformUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
+  const [, setTotal] = useState(0);
+  const [page] = useState(1);
   const [limit] = useState(50);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
@@ -46,12 +42,6 @@ const AdminUsers: React.FC = () => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-
-  // Get stats
-  const activeUsers = users.filter(u => u.isActive).length;
-  const inactiveUsers = users.filter(u => !u.isActive).length;
-  const platformAdmins = users.filter(u => u.roleId === 'PLATFORM_ADMIN').length;
-  const unverifiedUsers = users.filter(u => !u.isEmailVerified).length;
 
   const filteredUsers = users.filter(user => 
     (roleFilter === 'ALL' || user.roleId === roleFilter) && 

@@ -37,14 +37,14 @@ export default function CreditNotes() {
   const [clients, setClients] = useState<Client[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   const [formData, setFormData] = useState<CreateCreditNoteDto>({
     clientId: '',
     clientName: '',
     amount: 0,
-    reason: '',
+    reason: 'other' as const,
     reasonDetails: '',
     reference: '',
     invoiceId: '',
@@ -93,7 +93,7 @@ export default function CreditNotes() {
       clientId: '',
       clientName: '',
       amount: 0,
-      reason: '',
+      reason: 'other' as const,
       reasonDetails: '',
       reference: '',
       invoiceId: '',
@@ -344,8 +344,7 @@ export default function CreditNotes() {
                 <Label>Amount *</Label>
                 <Input
                   type="number"
-                  required
-                  min={0}
+                  min="0"
                   step={0.001}
                   value={formData.amount || ''}
                   onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
@@ -358,7 +357,7 @@ export default function CreditNotes() {
                 <select
                   required
                   value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, reason: e.target.value as CreateCreditNoteDto['reason'] })}
                   className="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">Select a reason...</option>

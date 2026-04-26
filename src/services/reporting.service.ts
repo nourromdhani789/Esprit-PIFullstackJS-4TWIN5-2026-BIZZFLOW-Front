@@ -5,6 +5,9 @@ export interface KPIData {
   totalExpenses: number;
   profit: number;
   profitMargin: number;
+  totalInvoices: number;
+  totalProducts: number;
+  totalClients: number;
 }
 
 export interface MonthlyData {

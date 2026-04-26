@@ -13,7 +13,7 @@ export default function PurchaseOrders() {
   const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [formData, setFormData] = useState<CreatePurchaseOrderDto>({
@@ -205,8 +205,7 @@ export default function PurchaseOrders() {
                 <Label>Total Amount</Label>
                 <Input
                   type="number"
-                  required
-                  min={0}
+                  min="0"
                   step={0.01}
                   value={formData.totalAmount}
                   onChange={(e) => setFormData({ ...formData, totalAmount: parseFloat(e.target.value) })}

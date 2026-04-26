@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ttsService } from '../../services/tts.service';
+import ttsService from '../../services/tts.service';
 import AIBadge from './AIBadge';
 
 interface TTSButtonProps {
@@ -28,7 +28,6 @@ export const TTSButton: React.FC<TTSButtonProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [showVoiceMenu, setShowVoiceMenu] = useState(false);
 
   const handlePlay = () => {
     if (isPaused) {

@@ -1,5 +1,4 @@
 import api from './api';
-import { AxiosError } from 'axios';
 
 export interface Payment {
   id: string;
@@ -55,7 +54,7 @@ export const paymentService = {
       const response = await api.post('/payments', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to create payment');
     }
   },
@@ -65,7 +64,7 @@ export const paymentService = {
       const response = await api.get('/payments', { params: filters });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get payments');
     }
   },
@@ -75,7 +74,7 @@ export const paymentService = {
       const response = await api.get(`/payments/${id}`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get payment');
     }
   },
@@ -85,7 +84,7 @@ export const paymentService = {
       const response = await api.patch(`/payments/${id}`, data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to update payment');
     }
   },
@@ -94,7 +93,7 @@ export const paymentService = {
     try {
       await api.delete(`/payments/${id}`);
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to delete payment');
     }
   },
@@ -104,7 +103,7 @@ export const paymentService = {
       const response = await api.get('/cash/balance');
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get cash balance');
     }
   },
@@ -114,7 +113,7 @@ export const paymentService = {
       const response = await api.get('/cash');
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get cash details');
     }
   },

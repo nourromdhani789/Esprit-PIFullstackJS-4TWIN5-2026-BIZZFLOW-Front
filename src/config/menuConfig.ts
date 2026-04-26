@@ -81,6 +81,39 @@ export const businessMenuItems: NavItem[] = [
     icon: 'GridIcon',
     roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
   },
+  // Tools Section - Split into multiple pages for better visibility
+  {
+    name: 'Tools Hub',
+    icon: 'ToolsIcon',
+    roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
+    subItems: [
+      {
+        name: 'All Tools',
+        path: '/tools',
+        roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
+      },
+      {
+        name: 'Focus & Tasks',
+        path: '/tools/focus',
+        roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
+      },
+      {
+        name: 'Currency Converter',
+        path: '/tools/currency',
+        roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
+      },
+      {
+        name: 'Business News',
+        path: '/tools/news',
+        roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
+      },
+      {
+        name: 'Tunisia Holidays',
+        path: '/tools/holidays',
+        roles: [Role.BUSINESS_OWNER, Role.BUSINESS_ADMIN, Role.ACCOUNTANT, Role.TEAM_MEMBER],
+      },
+    ],
+  },
   {
     name: 'User Profile',
     path: '/profile',

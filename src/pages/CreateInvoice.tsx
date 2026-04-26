@@ -54,7 +54,7 @@ export default function CreateInvoice() {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [stockError, setStockError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [showAddClient, setShowAddClient] = useState(false);
@@ -363,7 +363,7 @@ export default function CreateInvoice() {
     }
   };
 
-  const { isFocusMode, suggestedAction } = useFocusMode();
+  const { isFocusMode: _isFocusMode, suggestedAction: _suggestedAction } = useFocusMode();
   
   const selectedClient = clients.find((c) => c.id === formData.clientId);
 

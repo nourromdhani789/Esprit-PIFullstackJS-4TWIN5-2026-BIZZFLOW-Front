@@ -51,7 +51,7 @@ export default function CreateSalesOrder() {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [stockError, setStockError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [showAddClient, setShowAddClient] = useState(false);

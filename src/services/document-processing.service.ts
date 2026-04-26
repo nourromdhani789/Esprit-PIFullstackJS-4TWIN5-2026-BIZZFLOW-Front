@@ -135,7 +135,7 @@ export async function uploadDocument(file: File, businessId?: string): Promise<U
     formData.append('businessId', businessId);
   }
 
-  const response = await api.post<UploadResponse>('/document-processing/upload', formData, {
+  const response = await api.post('/document-processing/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -155,7 +155,7 @@ export async function getDocuments(
     offset?: number;
   }
 ): Promise<DocumentsListResponse> {
-  const response = await api.get<DocumentsListResponse>('/document-processing', {
+  const response = await api.get('/document-processing', {
     params,
   });
   return response.data;
@@ -165,7 +165,7 @@ export async function getDocuments(
  * Get a specific document by ID
  */
 export async function getDocument(id: string): Promise<{ success: boolean; data: ProcessedDocument }> {
-  const response = await api.get<{ success: boolean; data: ProcessedDocument }>(`/document-processing/${id}`);
+  const response = await api.get(`/document-processing/${id}`);
   return response.data;
 }
 
@@ -176,7 +176,7 @@ export async function updateExtractedData(
   id: string,
   correctedData: Record<string, any>
 ): Promise<{ success: boolean; message: string; data: ProcessedDocument }> {
-  const response = await api.patch<{ success: boolean; message: string; data: ProcessedDocument }>(
+  const response = await api.patch(
     `/document-processing/${id}/data`,
     { correctedData }
   );
@@ -191,7 +191,7 @@ export async function markDocumentCreated(
   createdDocumentId: string,
   createdDocumentType: 'invoice' | 'quote' | 'sales_order'
 ): Promise<{ success: boolean; message: string }> {
-  const response = await api.post<{ success: boolean; message: string }>(
+  const response = await api.post(
     `/document-processing/${id}/create-document`,
     { createdDocumentId, createdDocumentType }
   );
@@ -209,7 +209,7 @@ export function downloadDocumentUrl(id: string): string {
  * Retry processing a failed document
  */
 export async function retryProcessing(id: string): Promise<{ success: boolean; message: string; data: UploadResponse['data'] }> {
-  const response = await api.post<{ success: boolean; message: string; data: UploadResponse['data'] }>(
+  const response = await api.post(
     `/document-processing/${id}/retry`
   );
   return response.data;
@@ -219,7 +219,7 @@ export async function retryProcessing(id: string): Promise<{ success: boolean; m
  * Delete a processed document
  */
 export async function deleteDocument(id: string): Promise<{ success: boolean; message: string }> {
-  const response = await api.delete<{ success: boolean; message: string }>(`/document-processing/${id}`);
+  const response = await api.delete(`/document-processing/${id}`);
   return response.data;
 }
 

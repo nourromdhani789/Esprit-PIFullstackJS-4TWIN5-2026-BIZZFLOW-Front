@@ -127,8 +127,9 @@ export default function InvoiceScan() {
 
       const invoiceData: CreateInvoiceDto = {
         clientId: "scanned-client",
-        clientName: formData.clientName,
-        clientEmail: formData.clientEmail,
+        // clientName/clientEmail not part of CreateInvoiceDto
+        // clientName: formData.clientName,
+        // clientEmail: formData.clientEmail,
         notes: formData.notes,
         dueDate: formData.date,
         items: items.map((item) => ({

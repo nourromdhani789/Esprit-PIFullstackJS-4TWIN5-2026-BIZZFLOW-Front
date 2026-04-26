@@ -17,7 +17,7 @@ const AVAILABLE_ROLES = [
 ];
 
 export default function TeamInvitations() {
-  const { user, hasRole } = useAuth();
+  const { user, hasRole: _hasRole } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [members, setMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
