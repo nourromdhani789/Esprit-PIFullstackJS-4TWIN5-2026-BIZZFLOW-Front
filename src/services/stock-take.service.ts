@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import api from './api';
 
 export interface StockTake {
   id: string;
@@ -53,76 +51,54 @@ export interface UpdateStockTakeItemDto {
   notes?: string;
 }
 
-const getToken = () => localStorage.getItem('access_token');
-
 const stockTakeService = {
   getAll: async (): Promise<StockTake[]> => {
-    const response = await axios.get(`${API_URL}/stock-takes`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.get('/stock-takes');
     return response.data;
   },
 
   getById: async (id: string): Promise<{ stockTake: StockTake; items: StockTakeItem[] }> => {
-    const response = await axios.get(`${API_URL}/stock-takes/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.get(`/stock-takes/${id}`);
     return response.data;
   },
 
   create: async (dto: CreateStockTakeDto): Promise<StockTake> => {
-    const response = await axios.post(`${API_URL}/stock-takes`, dto, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.post('/stock-takes', dto);
     return response.data;
   },
 
   update: async (id: string, dto: UpdateStockTakeDto): Promise<StockTake> => {
-    const response = await axios.patch(`${API_URL}/stock-takes/${id}`, dto, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.patch(`/stock-takes/${id}`, dto);
     return response.data;
   },
 
   start: async (id: string): Promise<StockTake> => {
-    const response = await axios.post(`${API_URL}/stock-takes/${id}/start`, {}, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.post(`/stock-takes/${id}/start`);
     return response.data;
   },
 
   addItem: async (stockTakeId: string, dto: AddStockTakeItemDto): Promise<StockTakeItem> => {
-    const response = await axios.post(`${API_URL}/stock-takes/${stockTakeId}/items`, dto, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.post(`/stock-takes/${stockTakeId}/items`, dto);
     return response.data;
   },
 
   updateItem: async (itemId: string, dto: UpdateStockTakeItemDto): Promise<StockTakeItem> => {
-    const response = await axios.patch(`${API_URL}/stock-takes/items/${itemId}`, dto, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.patch(`/stock-takes/items/${itemId}`, dto);
     return response.data;
   },
 
   complete: async (id: string, action: 'adjust' | 'review' = 'review'): Promise<{ stockTake: StockTake }> => {
-    const response = await axios.post(`${API_URL}/stock-takes/${id}/complete`, { action }, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.post(`/stock-takes/${id}/complete`, { action });
     return response.data;
   },
 
   cancel: async (id: string): Promise<StockTake> => {
-    const response = await axios.post(`${API_URL}/stock-takes/${id}/cancel`, {}, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    const response = await api.post(`/stock-takes/${id}/cancel`);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await axios.delete(`${API_URL}/stock-takes/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    await api.delete(`/stock-takes/${id}`);
   },
 };
 

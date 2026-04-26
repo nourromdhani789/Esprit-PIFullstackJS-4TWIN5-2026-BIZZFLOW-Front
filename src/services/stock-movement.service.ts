@@ -1,5 +1,4 @@
 import api from './api';
-import { AxiosError } from 'axios';
 
 export interface StockMovement {
   id: string;
@@ -34,7 +33,7 @@ export const stockMovementService = {
       const response = await api.post('/stock-movements', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to create stock movement');
     }
   },
@@ -44,7 +43,7 @@ export const stockMovementService = {
       const response = await api.get('/stock-movements', { params: filters });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get stock movements');
     }
   },
@@ -54,7 +53,7 @@ export const stockMovementService = {
       const response = await api.get(`/stock-movements/${id}`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get stock movement');
     }
   },
@@ -64,7 +63,7 @@ export const stockMovementService = {
       const response = await api.get(`/stock-movements/product/${productId}/history`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get product history');
     }
   },
@@ -74,7 +73,7 @@ export const stockMovementService = {
       const response = await api.get('/stock-movements/products/low-stock');
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get low stock products');
     }
   },

@@ -96,6 +96,13 @@ import ActivityLog from "./pages/ActivityLog";
 import Notifications from "./pages/Notifications";
 import Calendar from "./pages/Calendar";
 import Blank from "./pages/Blank";
+import ToolsDashboard from "./pages/ToolsDashboard";
+
+// Tools Pages (Split for better navigation)
+import FocusTools from "./pages/FocusTools";
+import CurrencyTool from "./pages/CurrencyTool";
+import BusinessNews from "./pages/BusinessNews";
+import HolidaysCalendar from "./pages/HolidaysCalendar";
 
 // UI Elements & Charts
 import Videos from "./pages/UiElements/Videos";
@@ -209,6 +216,56 @@ export default function App() {
               element={
                 <BusinessRoute>
                   <Home />
+                </BusinessRoute>
+              }
+            />
+
+            {/* Tools Dashboard - All business roles */}
+            <Route
+              path="/tools"
+              element={
+                <BusinessRoute>
+                  <ToolsDashboard />
+                </BusinessRoute>
+              }
+            />
+
+            {/* Focus Tools - Pomodoro & Tasks */}
+            <Route
+              path="/tools/focus"
+              element={
+                <BusinessRoute>
+                  <FocusTools />
+                </BusinessRoute>
+              }
+            />
+
+            {/* Currency Converter */}
+            <Route
+              path="/tools/currency"
+              element={
+                <BusinessRoute>
+                  <CurrencyTool />
+                </BusinessRoute>
+              }
+            />
+
+            {/* Business News */}
+            <Route
+              path="/tools/news"
+              element={
+                <BusinessRoute>
+                  <BusinessNews />
+                </BusinessRoute>
+              }
+            />
+
+            {/* Holidays Calendar */}
+            <Route
+              path="/tools/holidays"
+              element={
+                <BusinessRoute>
+                  <HolidaysCalendar />
                 </BusinessRoute>
               }
             />

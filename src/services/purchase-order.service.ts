@@ -1,5 +1,4 @@
 import api from './api';
-import { AxiosError } from 'axios';
 
 export interface PurchaseOrder {
   id: string;
@@ -40,7 +39,7 @@ export const purchaseOrderService = {
       const response = await api.post('/purchase-orders', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to create purchase order');
     }
   },
@@ -50,7 +49,7 @@ export const purchaseOrderService = {
       const response = await api.get('/purchase-orders', { params: { status } });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get purchase orders');
     }
   },
@@ -60,7 +59,7 @@ export const purchaseOrderService = {
       const response = await api.get(`/purchase-orders/${id}`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get purchase order');
     }
   },
@@ -70,7 +69,7 @@ export const purchaseOrderService = {
       const response = await api.patch(`/purchase-orders/${id}`, data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to update purchase order');
     }
   },
@@ -80,7 +79,7 @@ export const purchaseOrderService = {
       const response = await api.patch(`/purchase-orders/${id}/receive`, data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to mark as received');
     }
   },
@@ -90,7 +89,7 @@ export const purchaseOrderService = {
       const response = await api.patch(`/purchase-orders/${id}/cancel`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to cancel purchase order');
     }
   },
@@ -99,7 +98,7 @@ export const purchaseOrderService = {
     try {
       await api.delete(`/purchase-orders/${id}`);
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to delete purchase order');
     }
   },

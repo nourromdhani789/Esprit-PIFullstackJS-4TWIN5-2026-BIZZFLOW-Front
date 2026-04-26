@@ -43,7 +43,7 @@ export default function Payments() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [cashBalance, setCashBalance] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   // Filter hook
@@ -158,8 +158,8 @@ export default function Payments() {
     return filtered;
   }, [payments, debouncedSearch, filters]);
 
-  // Calculate summary stats
-  const summaryStats = useMemo(() => {
+  // Calculate summary stats (reserved for future use)
+  const _summaryStats = useMemo(() => {
     const total = filteredPayments.length;
     const totalIn = filteredPayments
       .filter((p) => p.type === "IN")
@@ -169,6 +169,7 @@ export default function Payments() {
       .reduce((sum, p) => sum + Number(p.amount), 0);
     return { total, totalIn, totalOut };
   }, [filteredPayments]);
+  void _summaryStats;
 
   // Save/Load filters modal state
   const [showSaveModal, setShowSaveModal] = useState(false);

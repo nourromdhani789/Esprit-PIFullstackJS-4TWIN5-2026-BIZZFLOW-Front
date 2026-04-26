@@ -69,7 +69,7 @@ export default function UploadReceipt() {
       setExtractedData({
         amount: result.aiExtracted.amount.toString(),
         date: result.aiExtracted.date,
-        supplier: result.aiExtracted.supplier,
+        supplier: result.aiExtracted.supplier || '',
         description: "",
       });
     } catch (err: any) {
@@ -91,7 +91,7 @@ export default function UploadReceipt() {
         category,
         date: extractedData.date,
         receiptUrl: scanResult.receiptUrl,
-        supplier: extractedData.supplier,
+        supplierId: extractedData.supplier,
         description: extractedData.description,
       });
 

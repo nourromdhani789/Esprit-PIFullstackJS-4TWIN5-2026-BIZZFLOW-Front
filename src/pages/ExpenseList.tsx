@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import axios from "axios";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { expenseService, Expense } from "../services/expense.service";
 import Button from "../components/ui/button/Button";
@@ -131,7 +130,7 @@ export default function ExpenseList() {
     } catch (err: any) {
       let msg = `Failed to ${status} expense.`;
 
-      if (axios.isAxiosError(err) && err.response) {
+      if (err.response) {
         const data = err.response.data as any;
         if (data?.message) {
           msg = data.message;

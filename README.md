@@ -1,197 +1,306 @@
-# TailAdmin React - Free React Tailwind Admin Dashboard Template
+# BizFlow AI - Frontend
 
-TailAdmin is a free and open-source admin dashboard template built on **React and Tailwind CSS**, providing developers
-with everything they need to create a comprehensive, data-driven back-end,
-dashboard, or admin panel solution for upcoming web projects.
+A modern React-based dashboard for business management and financial tracking. Features AI-powered tools, real-time analytics, and a beautiful responsive UI. Built on top of TailAdmin React template.
 
-With TailAdmin, you get access to all the necessary dashboard UI components, elements, and pages required to build a
-feature-rich and complete dashboard or admin panel. Whether you're building dashboard or admin panel for a complex web
-application or a simple website, TailAdmin is the perfect solution to help you get up and running quickly.
+## 🚀 Features
 
-![TailAdmin React.js Dashboard Preview](./banner.png)
+### Dashboard & Analytics
+- **Smart KPI Cards** - Gradient cards with sparkline trends and real-time metrics
+- **Interactive Charts** - Revenue, expenses, and profit visualizations with Recharts
+- **Recent Activity Feed** - Live activity tracking with clickable entries
+- **Top Clients Analysis** - Revenue breakdown by client
 
-## Overview
+### Financial Management
+- **Invoice Management** - Create, edit, view, and generate PDF invoices
+- **Quotes & Sales Orders** - Full sales workflow from quote to invoice
+- **Expense Tracking** - Categorize expenses with receipt uploads
+- **Payment Recording** - Track money in/out with cash management
+- **Credit Notes** - Handle refunds and adjustments
 
-TailAdmin provides essential UI components and layouts for building feature-rich, data-driven admin dashboards and
-control panels. It's built on:
+### Inventory & Products
+- **Product Catalog** - Manage storable and consumable products
+- **Stock Management** - Real-time inventory with low stock alerts
+- **Stock Movements** - Track all inventory changes
+- **Purchase Orders** - Manage supplier orders
 
-- React 19
-- TypeScript
-- Tailwind CSS v4
+### AI-Powered Features
+- **AI Scanner** - OCR document processing for invoices and receipts
+- **AI Chatbot** - Floating assistant for natural language queries
+- **AI Anomaly Detection** - Highlight unusual invoice patterns
+- **AI Smart Auto-Fill** - Extract client info from pasted text
+- **AI Email Validation** - Real-time email verification
+- **AI Onboarding** - Interactive first-time user guide
+- **Focus Mode** - AI-guided workflow assistance
 
-### Quick Links
+### User Experience
+- **Dark Mode** - Full dark theme with glowing AI effects
+- **Responsive Design** - Works on desktop, tablet, and mobile
+- **Role-Based UI** - Interface adapts to user permissions
+- **Real-time Notifications** - Toast notifications for actions
+- **Drag & Drop** - File uploads and Kanban-style interactions
 
-- [✨ Visit Website](https://tailadmin.com)
-- [📄 Documentation](https://tailadmin.com/docs)
-- [⬇️ Download](https://tailadmin.com/download)
-- [🖌️ Figma Design File (Community Edition)](https://www.figma.com/community/file/1214477970819985778)
-- [⚡ Get PRO Version](https://tailadmin.com/pricing)
+### Calendar & Scheduling
+- **Full Calendar Integration** - Schedule events and view business activities
+- **Activity Timeline** - Visual history of all business actions
 
-### Demos
+## 🛠️ Tech Stack
 
-- [Free Version](https://free-react-demo.tailadmin.com/)
-- [Pro Version](https://react-demo.tailadmin.com)
+- **Framework**: React 19.x
+- **Build Tool**: Vite 6.x
+- **Language**: TypeScript 5.x
+- **Styling**: Tailwind CSS 4.x
+- **Charts**: Recharts, ApexCharts
+- **State Management**: React Context + Hooks
+- **Routing**: React Router 7.x
+- **HTTP Client**: Axios
+- **Rich Text**: CKEditor 5
+- **Calendar**: FullCalendar
+- **PDF Export**: jsPDF + html2canvas
+- **Drag & Drop**: react-dnd
 
-### Other Versions
+## 📋 Prerequisites
 
-- [HTML Version](https://github.com/TailAdmin/tailadmin-free-tailwind-dashboard-template)
-- [Next.js Version](https://github.com/TailAdmin/free-nextjs-admin-dashboard)
-- [Vue.js Version](https://github.com/TailAdmin/vue-tailwind-admin-dashboard)
-- [Angular Version](https://github.com/TailAdmin/free-angular-tailwind-dashboard)
-- [Laravel Version](https://github.com/TailAdmin/tailadmin-laravel)
+- Node.js 22.x or higher
+- Backend API running (see PI_TWIN5_BACK)
 
-## Installation
+## 🚀 Getting Started
 
-### Prerequisites
-
-To get started with TailAdmin, ensure you have the following prerequisites installed and set up:
-
-- Node.js 18.x or later (recommended to use Node.js 20.x or later)
-
-### Cloning the Repository
-
-Clone the repository using the following command:
+### 1. Install Dependencies
 
 ```bash
-git clone https://github.com/TailAdmin/free-react-tailwind-admin-dashboard.git
+cd PI_TWIN5_FRONT
+npm install
 ```
 
-> Windows Users: place the repository near the root of your drive if you face issues while cloning.
+### 2. Environment Configuration
 
-1. Install dependencies:
+Create a `.env` file in the root directory:
 
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+```env
+# API URL
+VITE_API_URL=http://localhost:3000
 
-2. Start the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+# App
+VITE_APP_NAME=BizFlow AI
+```
 
-## Components
+### 3. Run Development Server
 
-TailAdmin is a pre-designed starting point for building a web-based dashboard using React.js and Tailwind CSS. The
-template includes:
+```bash
+npm run dev
+```
 
-- Sophisticated and accessible sidebar
-- Data visualization components
-- Prebuilt profile management and 404 page
-- Tables and Charts(Line and Bar)
-- Authentication forms and input elements
-- Alerts, Dropdowns, Modals, Buttons and more
-- FAQ & Accordion, Testimonials, and Carousels
-- Can't forget Dark Mode 🕶️
+The app will be available at `http://localhost:5173`
 
-All components are built with React and styled using Tailwind CSS for easy customization.
+### 4. Build for Production
 
-## Feature Comparison
+```bash
+npm run build
+```
 
-### Free Version
+Output will be in the `dist/` folder.
 
-- 1 Unique Dashboard
-- 35+ dashboard components
-- 50+ UI elements
-- Basic Figma design files
-- Community support
+## 🏗️ Project Structure
 
-### Pro Version
+```
+src/
+├── components/
+│   ├── ai/              # AI components (Chatbot, Onboarding, Badges)
+│   ├── common/          # Shared components (Breadcrumb, Meta)
+│   ├── form/            # Form inputs and fields
+│   ├── ui/              # UI components (Button, Table, Charts)
+│   └── ...              # Other component categories
+├── context/             # React contexts (AuthContext)
+├── contexts/            # Additional contexts (BusinessContext, FocusModeContext)
+├── hooks/               # Custom React hooks
+├── icons/               # SVG icon components
+├── layout/              # Layout components (AppLayout, Sidebar, Header)
+├── pages/               # Page components
+│   ├── Admin/           # Admin dashboard pages
+│   ├── AuthPages/       # Signin, Signup, ForgotPassword
+│   ├── Charts/          # Chart pages
+│   ├── Dashboard/       # Home dashboard
+│   ├── Forms/           # Form elements showcase
+│   ├── Tables/          # Table showcase
+│   ├── UiElements/      # UI component showcase
+│   └── ...              # Main app pages
+├── services/            # API service functions
+├── styles/              # Global styles and animations
+├── config/              # App configuration
+├── App.tsx              # Main app component
+└── main.tsx             # Entry point
+```
 
-- 7 Unique Dashboards: Analytics, Ecommerce, Marketing, CRM, SaaS, Stocks, Logistics (more coming soon)
-- 500+ dashboard components and UI elements
-- Complete Figma design file
-- Email support
+## 🔐 Authentication Flow
 
-To learn more about pro version features and pricing, visit our [pricing page](https://tailadmin.com/pricing).
+1. User signs in via `/auth/signin`
+2. JWT token stored in localStorage
+3. AuthContext manages user state
+4. ProtectedRoute guards secure pages
+5. Role-based access control for features
 
-## Changelog
+## 🎨 Key Components
 
-### Version 2.1.0 - [Dec 30, 2025]
+### AI Components
+```
+components/ai/
+├── AIChatbotWidget.tsx    # Floating chatbot
+├── AIChatbotButton.tsx    # Chat toggle button
+├── AIOnboarding.tsx       # First-time guide
+├── AIBadge.tsx            # AI indicator badges
+├── AIActionButtons.tsx    # AI text enhancement buttons
+└── AILoading.tsx          # AI loading states
+```
 
-- Resolved Date Picker positioning and input issues in Charts.
+### Dashboard Components
+```
+components/ui/
+├── report-generator/      # AI report generator
+├── chart/                 # Chart components
+├── table/                 # Data tables
+├── button/                # Button variants
+└── modal/                 # Modal dialogs
+```
 
-### Version 2.0.2 - [March 25, 2025]
+### Layout Components
+```
+layout/
+├── AppLayout.tsx          # Main app wrapper
+├── AppSidebar.tsx         # Navigation sidebar with role-based menus
+├── AppHeader.tsx          # Top header with search/notifications
+└── SidebarWidget.tsx      # Sidebar promotional widget
+```
 
-- Upgraded to React 19
-- Included overrides for packages to prevent peer dependency errors.
-- Migrated from react-flatpickr to flatpickr package for React 19 support
+## 📊 Pages Overview
 
-### Version 2.0.1 - [February 27, 2025]
+### Main Business Pages
+- **Home** - Dashboard with KPIs, charts, recent activity
+- **InvoiceList/CreateInvoice/InvoiceDetail** - Full invoice workflow
+- **QuoteList/CreateQuote** - Quote management
+- **SalesOrderList/CreateSalesOrder** - Order processing
+- **ProductManagement** - Product catalog
+- **ClientList/ClientProfile** - CRM functionality
+- **SupplierList/SupplierProfile** - Supplier management
+- **StockManagement** - Inventory tracking
+- **ExpenseList/CreateExpense** - Expense tracking
+- **Payments** - Cash flow management
+- **CreditNotes** - Credit note handling
+- **AIScanner** - OCR document processing
 
-#### Update Overview
+### Admin Pages
+- **AdminDashboard** - Platform overview
+- **AdminUsers** - User management
+- **AdminBusinesses** - Business management
+- **AdminActivityLogs** - Platform activity
+- **AdminSettings** - System configuration
 
-- Upgraded to Tailwind CSS v4 for better performance and efficiency.
-- Updated class usage to match the latest syntax and features.
-- Replaced deprecated class and optimized styles.
+### Auth Pages
+- **SignIn** - Login page
+- **SignUp** - Registration
+- **ForgotPassword** - Password reset request
+- **ResetPassword** - Password reset confirmation
+- **VerifyEmail** - Email verification
 
-#### Next Steps
+## 🎯 Role-Based Access
 
-- Run npm install or yarn install to update dependencies.
-- Check for any style changes or compatibility issues.
-- Refer to the Tailwind CSS v4 [Migration Guide](https://tailwindcss.com/docs/upgrade-guide) on this release. if needed.
-- This update keeps the project up to date with the latest Tailwind improvements. 🚀
+Routes and UI elements are controlled by roles:
 
-### Version 2.0.0 - [February 2025]
+```typescript
+// Role hierarchy
+PLATFORM_ADMIN > BUSINESS_OWNER > BUSINESS_ADMIN > ACCOUNTANT > TEAM_MEMBER
 
-A major update with comprehensive redesign and modern React patterns implementation.
+// Usage in routing
+<FinancialRoute>  // Owner, Admin, Accountant
+<ManagerRoute>    // Owner, Admin
+<AdminRoute>      // Platform Admin only
+<BusinessRoute>   // All business roles
+```
 
-#### Major Improvements
+## 🌙 Dark Mode
 
-- Complete UI redesign with modern React patterns
-- New features: collapsible sidebar, chat, and calendar
-- Improved performance and accessibility
-- Updated data visualization using ApexCharts
+Toggle between light and dark themes:
+- Automatic system preference detection
+- Manual toggle in user menu
+- Persistent preference storage
+- Glowing effects on AI badges in dark mode
 
-#### Key Features
+## 📱 Responsive Design
 
-- Redesigned dashboards (Ecommerce, Analytics, Marketing, CRM)
-- Enhanced navigation with React Router integration
-- Advanced tables with sorting and filtering
-- Calendar with drag-and-drop support
-- New UI components and improved existing ones
+Breakpoints:
+- **Mobile**: < 640px
+- **Tablet**: 640px - 1024px
+- **Desktop**: > 1024px
 
-#### Breaking Changes
+Sidebar behavior:
+- Desktop: Collapsible sidebar (90px - 290px)
+- Mobile: Slide-out drawer
 
-- Updated sidebar component API
-- Migrated charts to ApexCharts
-- Revised authentication system
+## 🧪 Testing
 
-[Read more](https://tailadmin.com/docs/update-logs/react) on this release.
+```bash
+# Lint code
+npm run lint
 
-### Version 1.3.7 - [June 20, 2024]
+# Preview production build
+npm run preview
+```
 
-#### Enhancements
+## 🎨 Customization
 
-1. Remove Repetition of DefaultLayout in every Pages
-2. Add ClickOutside Component for reduce repeated functionality in Header Message, Notification and User Dropdowns.
+### Tailwind Config
+Colors and theme values are defined in `index.css` using CSS variables.
 
-### Version 1.3.6 - [Jan 31, 2024]
+### Adding New Pages
+1. Create component in `src/pages/`
+2. Add route in `App.tsx`
+3. Add to menu config if needed
+4. Wrap with appropriate route guard
 
-#### Enhancements
+### API Integration
+1. Add service function in `src/services/`
+2. Use in component with `useEffect` or mutations
+3. Handle loading and error states
 
-1. Integrate flatpickr in [Date Picker/Form Elements]
-2. Change color after select an option [Select Element/Form Elements].
-3. Make it functional [Multiselect Dropdown/Form Elements].
-4. Make best value editable [Pricing Table One/Pricing Table].
-5. Rearrange Folder structure.
+## 📦 Deployment
 
-### Version 1.2.0 - [Apr 28, 2023]
+### Static Hosting
+```bash
+npm run build
+# Deploy dist/ folder to Netlify, Vercel, or S3
+```
 
-- Add Typescript in TailAdmin React.
+### Environment Variables for Production
+```env
+VITE_API_URL=https://api.bizflow.ai
+```
 
-### Version 1.0.0 - Initial Release - [Mar 13, 2023]
+## 🔗 Integration with Backend
 
-- Initial release of TailAdmin React.
+Ensure the backend is running and CORS is configured:
+```typescript
+// Backend main.ts
+app.enableCors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+});
+```
 
-## License
+## 📚 Based on TailAdmin
 
-TailAdmin React.js Free Version is released under the MIT License.
+This project is built on the [TailAdmin React](https://tailadmin.com) free template, which provides:
+- Modern dashboard layouts
+- Reusable UI components
+- Tailwind CSS styling foundation
 
-## Support
+## 📝 License
 
-If you find this project helpful, please consider giving it a star on GitHub. Your support helps us continue developing
-and maintaining this template.
+UNLICENSED - Private software
+
+## 🤝 Support
+
+For support, email support@bizflow.ai or create an issue in the repository.
+
+---
+
+Built with ❤️ using React, Vite, and Tailwind CSS
+
