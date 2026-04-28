@@ -11,6 +11,17 @@ pipeline {
                 sh 'npm run test -- --watchAll=false --passWithNoTests'
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh '''
+                        npx sonarqube-scanner \
+                        -Dsonar.projectKey=pi_twin5_front \
+                        -Dsonar.sources=src
+                    '''
+                }
+            }
+        }
         stage('Build') {
             steps {
                 sh 'npm run build'
@@ -27,6 +38,11 @@ pipeline {
                     sh 'docker login -u $USER -p $PASS'
                     sh 'docker push oussemadn/pre-val-frontend:latest'
                 }
+            }
+        }
+        stage('Trigger CD') {
+            steps {
+                build job: 'frontend-cd', wait: false
             }
         }
     }

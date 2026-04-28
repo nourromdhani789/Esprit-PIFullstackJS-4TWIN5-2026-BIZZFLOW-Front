@@ -1,6 +1,7 @@
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import UserMetaCard from "../components/UserProfile/UserMetaCard";
 import UserInfoCard from "../components/UserProfile/UserInfoCard";
+import FaceIdSettings from "../components/auth/FaceIdSettings";
 import PageMeta from "../components/common/PageMeta";
 
 export default function UserProfiles() {
@@ -18,6 +19,12 @@ export default function UserProfiles() {
         <div className="space-y-6">
           <UserMetaCard />
           <UserInfoCard />
+          <div className="mt-6">
+            <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+              Security Settings
+            </h3>
+            <FaceIdSettings />
+          </div>
         </div>
       </div>
     </>
