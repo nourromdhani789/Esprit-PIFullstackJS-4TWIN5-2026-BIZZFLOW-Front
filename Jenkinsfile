@@ -40,5 +40,10 @@ pipeline {
                 }
             }
         }
+        stage('Trigger CD') {
+            steps {
+                build job: 'frontend-cd', wait: false
+            }
+        }
     }
 }
