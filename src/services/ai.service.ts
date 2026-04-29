@@ -1,5 +1,4 @@
-import api from './api';
-import { AxiosError } from 'axios';
+// api and AxiosError imports removed - not currently used
 
 export interface AnomalyResult {
   isAnomaly: boolean;
@@ -196,7 +195,7 @@ export const aiService = {
   },
 
   // 4. Document Translation using Groq API (more reliable than LibreTranslate)
-  async translateDocument(text: string, targetLang: string, sourceLang: string = 'auto'): Promise<string> {
+  async translateDocument(text: string, targetLang: string, _sourceLang: string = 'auto'): Promise<string> {
     try {
       if (!GROQ_API_KEY) {
         console.warn('No GROQ_API_KEY found');

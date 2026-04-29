@@ -112,7 +112,7 @@ export default function SalesOrderList() {
     fetchSalesOrders();
   }, []);
 
-  const handleDownloadPdf = async (id: string, orderNumber: string) => {
+  const _handleDownloadPdf = async (id: string, orderNumber: string) => {
     try {
       const blob = await salesOrderService.downloadPdf(id);
       const url = window.URL.createObjectURL(blob);
@@ -127,6 +127,7 @@ export default function SalesOrderList() {
       setError(err.message || "Failed to download PDF");
     }
   };
+  void _handleDownloadPdf;
 
   const handleConfirm = async (id: string) => {
     try {

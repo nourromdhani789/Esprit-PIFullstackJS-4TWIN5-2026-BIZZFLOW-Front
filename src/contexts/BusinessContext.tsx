@@ -19,10 +19,9 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   
   // Safely get auth - may not be available during initial render
-  let user = null;
   try {
     const auth = useAuth();
-    user = auth?.user || null;
+    void auth?.user;
   } catch (e) {
     // AuthContext not available yet
   }

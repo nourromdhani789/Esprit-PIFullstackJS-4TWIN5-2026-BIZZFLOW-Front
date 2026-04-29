@@ -1,5 +1,4 @@
 import api from './api';
-import { AxiosError } from 'axios';
 
 export interface CreditNote {
   id: string;
@@ -45,7 +44,7 @@ export const creditNoteService = {
       const response = await api.post('/credit-notes', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to create credit note');
     }
   },
@@ -55,7 +54,7 @@ export const creditNoteService = {
       const response = await api.get('/credit-notes', { params: { status } });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get credit notes');
     }
   },
@@ -65,7 +64,7 @@ export const creditNoteService = {
       const response = await api.get(`/credit-notes/${id}`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get credit note');
     }
   },
@@ -75,7 +74,7 @@ export const creditNoteService = {
       const response = await api.patch(`/credit-notes/${id}`, data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to update credit note');
     }
   },
@@ -85,7 +84,7 @@ export const creditNoteService = {
       const response = await api.patch(`/credit-notes/${id}/approve`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to approve credit note');
     }
   },
@@ -95,7 +94,7 @@ export const creditNoteService = {
       const response = await api.post(`/credit-notes/${id}/apply`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to apply credit note');
     }
   },
@@ -105,7 +104,7 @@ export const creditNoteService = {
       const response = await api.post(`/credit-notes/${id}/refund`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to refund credit note');
     }
   },
@@ -115,7 +114,7 @@ export const creditNoteService = {
       const response = await api.patch(`/credit-notes/${id}/cancel`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to cancel credit note');
     }
   },
@@ -124,7 +123,7 @@ export const creditNoteService = {
     try {
       await api.delete(`/credit-notes/${id}`);
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to delete credit note');
     }
   },

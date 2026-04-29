@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../../context/AuthContext';
 import { adminDashboardService, ActivityLog as ApiActivityLog } from '../../services/admin-dashboard.service';
 
 interface ActivityLog {
@@ -18,8 +16,6 @@ interface ActivityLog {
 }
 
 const AdminActivityLogs: React.FC = () => {
-  const navigate = useNavigate();
-  const { user: currentUser } = useAuth();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

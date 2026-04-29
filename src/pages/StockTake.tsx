@@ -1,6 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { stockTakeService, StockTake, StockTakeItem } from '../services/stock-take.service';
-import { productService } from '../services/product.service';
 import PageMeta from '../components/common/PageMeta';
 import PageBreadcrumb from '../components/common/PageBreadCrumb';
 import Button from '../components/ui/button/Button';
@@ -251,7 +250,6 @@ export default function StockTakePage() {
                 <Label>Name</Label>
                 <Input
                   type="text"
-                  required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g., Monthly Inventory Count"
@@ -272,7 +270,6 @@ export default function StockTakePage() {
                 <Label>Count Date</Label>
                 <Input
                   type="date"
-                  required
                   value={formData.countDate}
                   onChange={(e) => setFormData({ ...formData, countDate: e.target.value })}
                 />

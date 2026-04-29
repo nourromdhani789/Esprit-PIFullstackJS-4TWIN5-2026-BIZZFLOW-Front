@@ -1,5 +1,4 @@
 import api from './api';
-import { AxiosError } from 'axios';
 
 export interface CreateInvitationData {
   email: string;
@@ -37,7 +36,7 @@ export const invitationService = {
       const response = await api.post('/auth/invite', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to create invitation');
     }
   },
@@ -47,7 +46,7 @@ export const invitationService = {
       const response = await api.post('/auth/accept-invitation', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to accept invitation');
     }
   },
@@ -57,7 +56,7 @@ export const invitationService = {
       const response = await api.get('/auth/invitations/pending');
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get pending invitations');
     }
   },
@@ -67,7 +66,7 @@ export const invitationService = {
       const response = await api.delete(`/auth/invitations/${invitationId}`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to revoke invitation');
     }
   },
@@ -77,7 +76,7 @@ export const invitationService = {
       const response = await api.get(`/auth/invitations/validate/${token}`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Invalid or expired invitation token');
     }
   }

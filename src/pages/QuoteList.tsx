@@ -60,7 +60,7 @@ export default function QuoteList() {
   const {
     filters,
     setFilter,
-    clearFilter,
+    clearFilter: _clearFilter,
     clearAllFilters,
     hasActiveFilters,
     activeFilterCount,

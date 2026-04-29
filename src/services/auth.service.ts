@@ -1,5 +1,4 @@
 import api from './api';
-import { AxiosError } from 'axios';
 
 export interface LoginCredentials {
   email: string;
@@ -40,7 +39,7 @@ export const authService = {
       
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string; error?: string }>;
+      const axiosError = error as any;
       console.error('Login error:', axiosError.response?.data);
       console.error('Full error:', axiosError);
       
@@ -58,7 +57,7 @@ export const authService = {
       const response = await api.post('/auth/register', data);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Registration failed');
     }
   },
@@ -68,7 +67,7 @@ export const authService = {
       const response = await api.get('/auth/profile');
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get profile');
     }
   },
@@ -84,7 +83,7 @@ export const authService = {
       }
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to update profile');
     }
   },
@@ -94,7 +93,7 @@ export const authService = {
       const response = await api.get('/users/tenant/members');
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to get tenant members');
     }
   },
@@ -104,7 +103,7 @@ export const authService = {
       const response = await api.delete(`/users/tenant/members/${userId}`);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to delete tenant member');
     }
   },
@@ -114,7 +113,7 @@ export const authService = {
       const response = await api.post('/auth/reset-password', { email });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to send password reset email');
     }
   },
@@ -124,7 +123,7 @@ export const authService = {
       const response = await api.post('/auth/confirm-reset-password', { token, newPassword });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to reset password');
     }
   },
@@ -134,7 +133,7 @@ export const authService = {
       const response = await api.post('/auth/verify-email', { token });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as any;
       throw new Error(axiosError.response?.data?.message || 'Failed to verify email');
     }
   },

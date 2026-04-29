@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../../context/AuthContext';
 import { adminDashboardService, PlatformBusiness } from '../../services/admin-dashboard.service';
 
 const AdminBusinesses: React.FC = () => {
-  const navigate = useNavigate();
-  const { user: currentUser } = useAuth();
   const [businesses, setBusinesses] = useState<PlatformBusiness[]>([]);
   const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
+  const [, setTotal] = useState(0);
+  const [page] = useState(1);
   const [limit] = useState(50);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBusinesses, setSelectedBusinesses] = useState<string[]>([]);
