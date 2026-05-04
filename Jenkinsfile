@@ -8,7 +8,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'npm run test -- --watchAll=false --passWithNoTests'
+                sh 'npm run test -- --coverage --watchAll=false --passWithNoTests'
             }
         }
         stage('SonarQube Analysis') {
@@ -17,7 +17,12 @@ pipeline {
                     sh '''
                         npx sonarqube-scanner \
                         -Dsonar.projectKey=pi_twin5_front \
-                        -Dsonar.sources=src
+                        -Dsonar.sources=src \
+                        -Dsonar.tests=src \
+                        -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx \
+                        -Dsonar.exclusions=**/*.test.ts,**/*.test.tsx,**/node_modules/** \
+                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                        -Dsonar.coverage.exclusions=**/node_modules/**
                     '''
                 }
             }
