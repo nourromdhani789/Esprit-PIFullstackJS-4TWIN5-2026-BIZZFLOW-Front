@@ -37,7 +37,7 @@ pipeline {
         }
         stage('Docker Build') {
             steps {
-                sh 'docker build -t oussemadn/pre-val-frontend:latest .'
+                sh 'docker build --no-cache -t oussemadn/pre-val-frontend:latest .'
             }
         }
         stage('Docker Push') {
