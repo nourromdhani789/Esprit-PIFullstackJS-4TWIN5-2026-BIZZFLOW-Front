@@ -1,6 +1,11 @@
 // Mock Notification API before any component imports
 // This must be defined here (in setupFiles) so it's available when components load
 
+// Polyfill TextEncoder/TextDecoder for jsdom environment
+import { TextEncoder, TextDecoder } from 'util';
+(global as any).TextEncoder = TextEncoder;
+(global as any).TextDecoder = TextDecoder;
+
 // Create a proper Notification constructor mock
 function MockNotification() {
   return { close: jest.fn() };
