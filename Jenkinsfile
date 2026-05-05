@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        VITE_API_URL = 'http://192.168.220.50:30001'
+    }
     stages {
         stage('Install') {
             steps {
@@ -29,7 +32,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'npm run build'
+                sh 'VITE_API_URL=$VITE_API_URL npm run build'
             }
         }
         stage('Docker Build') {
