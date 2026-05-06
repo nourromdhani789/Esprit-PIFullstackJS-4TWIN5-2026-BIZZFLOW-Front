@@ -6,10 +6,8 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.test.ts', '**/__tests__/**/*.test.tsx'],
   testPathIgnorePatterns: [
     '/node_modules/',
+    '<rootDir>/src/pages/__tests__/',
     '<rootDir>/src/services/__tests__/api.integration.test.ts',
-    '<rootDir>/src/pages/__tests__/ProductManagement.test.tsx',
-    '<rootDir>/src/pages/__tests__/InvoiceList.test.tsx',
-    '<rootDir>/src/pages/__tests__/ClientList.test.tsx',
   ],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
