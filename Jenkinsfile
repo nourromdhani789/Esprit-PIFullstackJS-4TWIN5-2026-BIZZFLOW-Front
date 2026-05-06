@@ -37,7 +37,7 @@ pipeline {
         }
         stage('Docker Build') {
             steps {
-                sh 'docker build --no-cache --build-arg VITE_API_URL=$VITE_API_URL -t oussemadn/pre-val-frontend:latest .'
+                sh 'docker build --build-arg VITE_API_URL=$VITE_API_URL -t oussemadn/pre-val-frontend:latest .'
             }
         }
         stage('Docker Push') {
